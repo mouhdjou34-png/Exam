@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>تطبيق الحارس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:#0D1117;color:#E6EDF3;
+  min-height:100vh;max-width:430px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden}
+::-webkit-scrollbar{width:0}
+input,textarea,button{font-family:'Tajawal',sans-serif}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,#0D1117,#1B4332,#2D6A4F);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:999;transition:opacity .4s}
+#splash h1{color:#fff;font-size:28px;font-weight:900;margin:16px 0 6px}
+#splash p{color:rgba(255,255,255,.55);font-size:14px}
+#configScreen{display:none;flex-direction:column;flex:1}
+.config-hero{background:linear-gradient(160deg,#0D1117,#1B4332);padding:60px 24px 30px;text-align:center}
+.config-hero .icon{font-size:60px;margin-bottom:14px}
+.config-hero h1{color:#fff;font-size:22px;font-weight:900;margin-bottom:6px}
+.config-hero p{color:rgba(255,255,255,.5);font-size:13px;line-height:1.7}
+.config-body{padding:24px 16px 40px;flex:1}
+.field-label{color:#8B949E;font-size:12px;font-weight:700;letter-spacing:.6px;margin-bottom:7px}
+.field-wrap{margin-bottom:14px}
+input[type=text]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;color:#E6EDF3;font-size:14px;padding:13px 14px;outline:none}
+input[type=text]:focus{border-color:rgba(63,185,80,.5)}
+.room-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:6px}
+.room-tile{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:13px;padding:13px 10px;cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:all .15s}
+.room-tile:active{transform:scale(.95)}
+.room-tile.sel{border-color:#3FB950;background:rgba(63,185,80,.1)}
+.room-tile span{color:#E6EDF3;font-size:13px;font-weight:600}
+.big-btn{width:100%;padding:16px;border:none;border-radius:16px;color:#fff;
+  font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;
+  background:linear-gradient(135deg,#2D6A4F,#40916C);
+  box-shadow:0 6px 20px rgba(45,106,79,.4);transition:transform .1s}
+.big-btn:active{transform:scale(.97)}
+.big-btn:disabled{background:rgba(255,255,255,.07);color:#4B5563;box-shadow:none}
+#formScreen{display:none;flex-direction:column;flex:1}
+.header{padding:52px 16px 18px;position:relative;overflow:hidden}
+.header-guard{background:linear-gradient(135deg,#1B4332,#2D6A4F)}
+.header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.back-btn{background:rgba(255,255,255,.13);border:none;color:#fff;border-radius:10px;
+  padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600}
+.header-center{text-align:center;flex:1}
+.header-center small{color:rgba(255,255,255,.6);font-size:11px;font-weight:600}
+.header-center h1{color:#fff;font-size:20px;font-weight:900}
+.last-badge{background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.2);
+  border-radius:10px;padding:8px 12px;margin-top:12px;display:flex;align-items:center;gap:8px;
+  position:relative;z-index:1}
+.last-badge span{color:#6EE7B7;font-size:12px;font-weight:600}
+.form-body{padding:18px 16px 110px;flex:1;overflow-y:auto}
+.card{background:#161B22;border:1px solid rgba(255,255,255,.07);border-radius:18px;
+  padding:18px 16px;margin-bottom:13px}
+.card-head{display:flex;align-items:center;gap:9px;margin-bottom:15px}
+.card-head .ico{font-size:22px}
+.card-head h2{color:#E2E8F0;font-size:15px;font-weight:700}
+.counter{display:flex;align-items:center;justify-content:center;gap:22px}
+.cnt-btn{width:54px;height:54px;border-radius:16px;border:none;color:#fff;
+  font-size:28px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .1s}
+.cnt-btn:active{transform:scale(.88)}
+.cnt-val{font-size:56px;font-weight:900;min-width:72px;text-align:center;line-height:1}
+textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;color:#E6EDF3;font-size:14px;padding:12px 14px;outline:none;resize:none;line-height:1.7}
+textarea:focus{border-color:rgba(251,191,36,.4)}
+.bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;background:rgba(13,17,23,.97);
+  backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);
+  padding:14px 16px 28px}
+.submit-btn{width:100%;padding:16px;border:none;border-radius:16px;color:#fff;
+  font-size:16px;font-weight:800;cursor:pointer;
+  background:linear-gradient(135deg,#2D6A4F,#1B7A5A);
+  box-shadow:0 6px 20px rgba(45,106,79,.4);transition:transform .1s}
+.submit-btn:active{transform:scale(.97)}
+.submit-btn.ok{background:linear-gradient(135deg,#065F46,#047857)!important}
+.submit-btn:disabled{opacity:.6}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
+  background:#065F46;color:#6EE7B7;padding:11px 22px;border-radius:20px;
+  font-size:14px;font-weight:700;border:1px solid rgba(110,231,183,.3);
+  opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
+.offline-bar{background:#7F1D1D;color:#FCA5A5;padding:8px 16px;
+  font-size:12px;font-weight:600;text-align:center;display:none}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div style="font-size:70px">👮</div>
+  <h1>تطبيق الحارس</h1>
+  <p>نظام مراقبة الامتحانات</p>
+  <div style="margin-top:28px;color:rgba(255,255,255,.4);font-size:13px" id="splashStatus">جاري الاتصال...</div>
+</div>
+
+<div class="offline-bar" id="offlineBar">⚠️ لا يوجد اتصال بالإنترنت — سيُرسَل التقرير عند عودة الاتصال</div>
+
+<div id="configScreen" style="display:flex">
+  <div class="config-hero">
+    <div class="icon">🏫</div>
+    <h1>مرحباً بك</h1>
+    <p>أدخل اسمك واختر قاعتك<br/>للبدء في إرسال التقارير</p>
+  </div>
+  <div class="config-body">
+    <div class="field-wrap">
+      <div class="field-label">👤 اسم الحارس</div>
+      <input type="text" id="guardNameInp" placeholder="أدخل اسمك الكامل..."/>
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">🏫 اختر القاعة</div>
+      <div class="room-grid" id="roomGrid"></div>
+    </div>
+    <button class="big-btn" id="startBtn" disabled onclick="startForm()">▶ دخول القاعة</button>
+  </div>
+</div>
+
+<div id="formScreen">
+  <div class="header header-guard">
+    <div class="header-top">
+      <button class="back-btn" onclick="goConfig()">← رجوع</button>
+      <div class="header-center">
+        <small>حارس القاعة</small>
+        <h1 id="formRoomTitle">—</h1>
+      </div>
+      <div style="width:72px"></div>
+    </div>
+    <div id="guardInfo" style="text-align:center;margin-top:8px;position:relative;z-index:1"></div>
+    <div id="lastBadge" style="display:none" class="last-badge">
+      <span>🕐</span><span id="lastBadgeText"></span>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="card" style="border-right:3px solid #3FB950">
+      <div class="card-head"><span class="ico">👮</span><h2>عدد الحراس في القاعة</h2></div>
+      <div class="counter">
+        <button class="cnt-btn" style="background:#1B4332" ontouchstart="" onclick="change('g',-1)">−</button>
+        <div><div class="cnt-val" style="color:#3FB950" id="gVal">1</div>
+          <div style="color:#4B5563;font-size:11px;text-align:center">حارس</div></div>
+        <button class="cnt-btn" style="background:#2D6A4F" ontouchstart="" onclick="change('g',1)">+</button>
+      </div>
+    </div>
+
+    <div class="card" style="border-right:3px solid #F87171">
+      <div class="card-head"><span class="ico">🚫</span><h2>عدد التلاميذ الغائبين</h2></div>
+      <div class="counter">
+        <button class="cnt-btn" style="background:#7F1D1D" ontouchstart="" onclick="change('a',-1)">−</button>
+        <div><div class="cnt-val" style="color:#8B949E" id="aVal">0</div>
+          <div style="color:#4B5563;font-size:11px;text-align:center">غائب</div></div>
+        <button class="cnt-btn" style="background:#991B1B" ontouchstart="" onclick="change('a',1)">+</button>
+      </div>
+    </div>
+
+    <div class="card" style="border-right:3px solid #FBBF24">
+      <div class="card-head"><span class="ico">📝</span><h2>ملاحظات</h2></div>
+      <textarea id="notesInp" rows="3" placeholder="غش، حادثة، مشكلة تقنية..."></textarea>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="submit-btn" id="submitBtn" onclick="submitReport()">📤 إرسال التقرير</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyD62It05IMsn3nXYo0B38sqXm4IQB6PGzc",
+  authDomain:        "amana-989c9.firebaseapp.com",
+  databaseURL:       "https://amana-989c9-default-rtdb.firebaseio.com",
+  projectId:         "amana-989c9",
+  storageBucket:     "amana-989c9.firebasestorage.app",
+  messagingSenderId: "796537653849",
+  appId:             "1:796537653849:web:3a5d394f3ab71a8f2c6b1e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+let state = { room:null, guardName:'', guards:1, absent:0, notes:'' };
+let rooms = [];
+
+function fmt(iso){ if(!iso)return''; const d=new Date(iso); return d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=ok?'#065F46':'#7F1D1D';
+  t.style.color=ok?'#6EE7B7':'#FCA5A5'; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+async function loadRooms(){
+  document.getElementById('splashStatus').textContent='جاري تحميل القاعات...';
+  try{
+    const snap = await get(ref(db,'rooms'));
+    if(snap.exists()) rooms = Object.values(snap.val());
+    else {
+      rooms=[
+        {id:'A1',name:'قاعة A1'},{id:'A2',name:'قاعة A2'},
+        {id:'B1',name:'قاعة B1'},{id:'B2',name:'قاعة B2'},
+        {id:'C1',name:'قاعة C1'},{id:'C2',name:'قاعة C2'},
+      ];
+      const obj={};rooms.forEach(r=>obj[r.id]=r);
+      await set(ref(db,'rooms'),obj);
+    }
+    renderRooms();
+    hideSplash();
+  } catch(e){
+    document.getElementById('splashStatus').textContent='⚠️ تحقق من الإنترنت وأعد تحميل الصفحة';
+    console.error(e);
+  }
+}
+
+function hideSplash(){
+  const s=document.getElementById('splash');
+  s.style.opacity='0'; setTimeout(()=>s.style.display='none',400);
+}
+
+function renderRooms(){
+  const grid=document.getElementById('roomGrid');
+  grid.innerHTML=rooms.map(r=>`
+    <div class="room-tile ${state.room?.id===r.id?'sel':''}" onclick="selectRoom('${r.id}')">
+      <span style="font-size:20px">🏫</span><span>${r.name}</span>
+    </div>`).join('');
+}
+
+window.selectRoom = function(id){
+  state.room=rooms.find(r=>r.id===id);
+  renderRooms();
+  document.getElementById('startBtn').disabled=!state.room;
+};
+
+document.getElementById('guardNameInp').addEventListener('input',function(){
+  state.guardName=this.value;
+});
+
+window.startForm = function(){
+  state.guardName=document.getElementById('guardNameInp').value.trim()||'غير محدد';
+  if(!state.room) return;
+  document.getElementById('configScreen').style.display='none';
+  document.getElementById('formScreen').style.display='flex';
+  document.getElementById('formRoomTitle').textContent=state.room.name;
+  if(state.guardName!=='غير محدد'){
+    document.getElementById('guardInfo').innerHTML=
+      `<span style="background:rgba(255,255,255,.1);border-radius:8px;padding:4px 12px;color:rgba(255,255,255,.75);font-size:12px">👤 ${state.guardName}</span>`;
+  }
+  get(ref(db,`reports/${state.room.id}`)).then(snap=>{
+    if(snap.exists()){
+      const r=snap.val();
+      document.getElementById('lastBadge').style.display='flex';
+      document.getElementById('lastBadgeText').textContent=
+        `آخر إرسال: ${fmt(r.sentAt)}  |  حراس: ${r.guards}  |  غائب: ${r.absent}`;
+    }
+  });
+};
+
+window.goConfig = function(){
+  document.getElementById('formScreen').style.display='none';
+  document.getElementById('configScreen').style.display='flex';
+};
+
+window.change = function(f,d){
+  if(f==='g') state.guards=Math.max(1,state.guards+d);
+  if(f==='a') state.absent=Math.max(0,state.absent+d);
+  document.getElementById('gVal').textContent=state.guards;
+  const av=document.getElementById('aVal');
+  av.textContent=state.absent;
+  av.style.color=state.absent>0?'#F87171':'#8B949E';
+};
+
+window.submitReport = async function(){
+  const btn=document.getElementById('submitBtn');
+  btn.textContent='⟳ جاري الإرسال...'; btn.disabled=true;
+  const report={
+    roomId:state.room.id, roomName:state.room.name,
+    guardName:state.guardName, guards:state.guards,
+    absent:state.absent, notes:document.getElementById('notesInp').value,
+    sentAt:new Date().toISOString()
+  };
+  try{
+    await set(ref(db,`reports/${state.room.id}`),report);
+    toast('✅ تم إرسال التقرير بنجاح!');
+    btn.textContent='✓ تم الإرسال!'; btn.classList.add('ok');
+    document.getElementById('lastBadge').style.display='flex';
+    document.getElementById('lastBadgeText').textContent=
+      `آخر إرسال: ${fmt(report.sentAt)}  |  حراس: ${report.guards}  |  غائب: ${report.absent}`;
+    setTimeout(()=>{btn.textContent='📤 إرسال تقرير جديد';btn.classList.remove('ok');btn.disabled=false;},2500);
+  } catch(e){
+    toast('❌ فشل الإرسال، تحقق من الإنترنت',false);
+    btn.textContent='📤 إرسال التقرير'; btn.disabled=false;
+  }
+};
+
+window.addEventListener('online', ()=>document.getElementById('offlineBar').style.display='none');
+window.addEventListener('offline',()=>document.getElementById('offlineBar').style.display='block');
+
+loadRooms();
+</script>
+</body>
+</html>

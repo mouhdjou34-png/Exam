@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>لوحة المشرف</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:#060A12;color:#E2E8F0;
+  min-height:100vh;max-width:440px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden}
+::-webkit-scrollbar{width:0}
+input,textarea,button{font-family:'Tajawal',sans-serif}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,#060A12,#0F2044,#1D4ED8);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s}
+#splash h1{color:#fff;font-size:26px;font-weight:900;margin:14px 0 6px}
+#splash p{color:rgba(255,255,255,.5);font-size:13px}
+#splashStatus{margin-top:28px;color:rgba(255,255,255,.4);font-size:13px}
+.header{background:linear-gradient(150deg,#060A12 0%,#0D1D3A 50%,#1D4ED8 100%);
+  padding:52px 16px 20px;position:relative;overflow:hidden}
+.header::before{content:'🎓';position:absolute;right:-8px;top:10px;font-size:100px;opacity:.05;transform:rotate(12deg)}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header-center{text-align:center;flex:1}
+.header-center small{color:rgba(147,197,253,.7);font-size:11px;font-weight:600;letter-spacing:.7px}
+.header-center h1{color:#fff;font-size:20px;font-weight:900}
+.refresh-btn{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);
+  color:#60A5FA;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:22px;
+  transition:transform .2s;line-height:1}
+.refresh-btn:active{transform:scale(.9)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite}
+.ticker{background:rgba(59,130,246,.08);border-bottom:1px solid rgba(59,130,246,.12);
+  padding:7px 16px;font-size:12px;color:#60A5FA;display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 14px 0}
+.stat{background:#0D1421;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:11px 6px;text-align:center}
+.stat-ico{font-size:15px;margin-bottom:3px}
+.stat-val{font-size:21px;font-weight:900;line-height:1}
+.stat-lbl{color:#64748B;font-size:9px;margin-top:3px;line-height:1.4}
+.prog-wrap{padding:13px 14px 0}
+.prog-hdr{display:flex;justify-content:space-between;margin-bottom:6px}
+.prog-track{background:rgba(255,255,255,.07);border-radius:6px;height:8px}
+.prog-fill{height:8px;border-radius:6px;background:linear-gradient(90deg,#3B82F6,#34D399);transition:width .6s ease}
+.content{padding:13px 14px 40px;flex:1;overflow-y:auto}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.6px;margin:14px 0 9px;
+  display:flex;align-items:center;gap:6px}
+.rcard{background:#0D1421;border:1px solid rgba(255,255,255,.07);border-radius:16px;
+  padding:14px 13px 12px;margin-bottom:10px;border-right:3px solid #34D399;
+  animation:fadeIn .25s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.rcard-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px}
+.rcard-info{flex:1}
+.rcard-info h3{color:#E2E8F0;font-weight:800;font-size:15px}
+.rcard-info .sub{color:#64748B;font-size:12px;margin-top:1px}
+.time-badge{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
+  color:#6EE7B7;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:10px}
+.pill-v{font-size:19px;font-weight:800}
+.pill-l{font-size:11px;color:#64748B}
+.notes-box{margin-top:9px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.13);
+  border-radius:10px;padding:8px 10px}
+.notes-box p{color:#FCD34D;font-size:12px;line-height:1.6}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#4B5563;padding:2px 4px}
+.pending-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.pend-item{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);
+  border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:5px}
+.pend-item span{color:#D97706;font-size:13px;font-weight:600}
+.add-btn{width:100%;padding:12px;background:rgba(255,255,255,.04);
+  border:1px dashed rgba(255,255,255,.12);border-radius:14px;color:#64748B;
+  font-size:14px;font-weight:600;cursor:pointer;margin-top:14px}
+.add-form{display:flex;gap:8px;padding:12px 13px;background:#0D1421;
+  border:1px solid rgba(255,255,255,.07);border-radius:14px;margin-top:14px}
+input[type=text]{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;color:#E2E8F0;font-size:14px;padding:10px 12px;outline:none;flex:1}
+input[type=text]:focus{border-color:rgba(59,130,246,.4)}
+.save-btn{background:linear-gradient(135deg,#1D4ED8,#2563EB);border:none;
+  border-radius:10px;color:#fff;padding:10px 16px;cursor:pointer;font-size:13px;font-weight:700}
+.cancel-btn{background:rgba(255,255,255,.06);border:none;border-radius:10px;
+  color:#64748B;padding:10px 12px;cursor:pointer;font-size:16px}
+.export-btn{width:100%;padding:13px;background:rgba(167,139,250,.09);
+  border:1px solid rgba(167,139,250,.22);border-radius:14px;color:#C4B5FD;
+  font-size:14px;font-weight:700;cursor:pointer;margin-top:10px}
+.clear-btn{width:100%;padding:12px;background:rgba(248,113,113,.07);
+  border:1px solid rgba(248,113,113,.2);border-radius:14px;color:#F87171;
+  font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:#065F46;color:#6EE7B7;padding:11px 22px;border-radius:20px;
+  font-size:14px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div style="font-size:70px">🖥️</div>
+  <h1>لوحة المشرف</h1>
+  <p>نظام مراقبة الامتحانات</p>
+  <div id="splashStatus">جاري الاتصال بالخادم...</div>
+</div>
+
+<div id="mainApp" style="display:none;flex-direction:column;flex:1;min-height:100vh">
+  <div class="header">
+    <div class="header-top">
+      <div style="width:70px"></div>
+      <div class="header-center">
+        <small>لوحة التحكم</small>
+        <h1>🖥️ المشرف العام</h1>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">🔄</button>
+    </div>
+  </div>
+  <div class="ticker"><div class="dot"></div><span id="tickerText">جاري التحديث...</span></div>
+  <div class="stats" id="statsRow"></div>
+  <div class="prog-wrap">
+    <div class="prog-hdr">
+      <span style="color:#64748B;font-size:12px">اكتمال التقارير</span>
+      <span style="color:#3B82F6;font-size:12px;font-weight:700" id="pctText">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, remove, onValue, push }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyD62It05IMsn3nXYo0B38sqXm4IQB6PGzc",
+  authDomain:        "amana-989c9.firebaseapp.com",
+  databaseURL:       "https://amana-989c9-default-rtdb.firebaseio.com",
+  projectId:         "amana-989c9",
+  storageBucket:     "amana-989c9.firebasestorage.app",
+  messagingSenderId: "796537653849",
+  appId:             "1:796537653849:web:3a5d394f3ab71a8f2c6b1e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+let rooms   = [];
+let reports = {};
+let showAdd = false;
+
+function fmt(iso){ if(!iso)return''; const d=new Date(iso); return d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
+function now(){ return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function hideSplash(){
+  const s=document.getElementById('splash'); s.style.opacity='0';
+  setTimeout(()=>{s.style.display='none'; document.getElementById('mainApp').style.display='flex';},400);
+}
+
+function startListeners(){
+  onValue(ref(db,'rooms'),(snap)=>{
+    rooms = snap.exists() ? Object.values(snap.val()) : [];
+    renderAll();
+  });
+  onValue(ref(db,'reports'),(snap)=>{
+    reports = snap.exists() ? snap.val() : {};
+    renderAll();
+    document.getElementById('tickerText').textContent=`آخر تحديث: ${now()} · مباشر 🟢`;
+  });
+}
+
+async function init(){
+  document.getElementById('splashStatus').textContent='جاري الاتصال...';
+  try{
+    startListeners();
+    hideSplash();
+  } catch(e){
+    document.getElementById('splashStatus').textContent='⚠️ فشل الاتصال، تحقق من الإنترنت';
+  }
+}
+
+function renderAll(){
+  const reported = rooms.filter(r=>reports[r.id]);
+  const pending  = rooms.filter(r=>!reports[r.id]);
+  const totalG   = Object.values(reports).reduce((s,r)=>s+(r.guards||0),0);
+  const totalA   = Object.values(reports).reduce((s,r)=>s+(r.absent||0),0);
+  const withN    = Object.values(reports).filter(r=>r.notes?.trim()).length;
+  const pct      = rooms.length ? Math.round(reported.length/rooms.length*100) : 0;
+
+  document.getElementById('statsRow').innerHTML=[
+    {ico:'✅',val:`${reported.length}/${rooms.length}`,lbl:'تقارير',col:'#34D399'},
+    {ico:'👮',val:totalG,lbl:'الحراس',col:'#60A5FA'},
+    {ico:'🚫',val:totalA,lbl:'الغائبون',col:'#F87171'},
+    {ico:'📝',val:withN,lbl:'ملاحظات',col:'#FBBF24'},
+  ].map(s=>`<div class="stat">
+    <div class="stat-ico">${s.ico}</div>
+    <div class="stat-val" style="color:${s.col}">${s.val}</div>
+    <div class="stat-lbl">${s.lbl}</div>
+  </div>`).join('');
+
+  document.getElementById('pctText').textContent=pct+'%';
+  document.getElementById('progFill').style.width=pct+'%';
+
+  let html='';
+
+  if(reported.length){
+    html+=`<div class="sec-title" style="color:#34D399">✅ التقارير الواردة (${reported.length})</div>`;
+    html+=reported.map(room=>{
+      const r=reports[room.id];
+      return `<div class="rcard">
+        <div class="rcard-top">
+          <span style="font-size:22px">🏫</span>
+          <div class="rcard-info">
+            <h3>${room.name}</h3>
+            <div class="sub">👤 ${r.guardName||'غير محدد'}</div>
+          </div>
+          <span class="time-badge">🕐 ${fmt(r.sentAt)}</span>
+          <button class="del-btn" onclick="clearReport('${room.id}')">🗑️</button>
+        </div>
+        <div class="pills">
+          <div class="pill" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)">
+            <span style="font-size:16px">👮</span>
+            <span class="pill-v" style="color:#60A5FA">${r.guards}</span>
+            <span class="pill-l">حارس</span>
+          </div>
+          <div class="pill" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2)">
+            <span style="font-size:16px">🚫</span>
+            <span class="pill-v" style="color:${r.absent>0?'#F87171':'#64748B'}">${r.absent}</span>
+            <span class="pill-l">غائب</span>
+          </div>
+        </div>
+        ${r.notes?.trim()?`<div class="notes-box"><p>📝 ${r.notes}</p></div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  if(pending.length){
+    html+=`<div class="sec-title" style="color:#FBBF24">⏳ في انتظار التقرير (${pending.length})</div>
+    <div class="pending-grid">
+      ${pending.map(r=>`<div class="pend-item"><span style="font-size:14px">⏳</span><span>${r.name}</span></div>`).join('')}
+    </div>`;
+  }
+
+  if(!rooms.length){
+    html+=`<div style="text-align:center;padding:50px 20px;color:#374151">
+      <div style="font-size:48px;margin-bottom:12px">📭</div>
+      <p style="font-size:15px;font-weight:600">لا توجد قاعات بعد</p>
+      <p style="font-size:13px;margin-top:4px;color:#4B5563">أضف قاعات أدناه</p>
+    </div>`;
+  }
+
+  html += showAdd ?
+    `<div class="add-form">
+      <input type="text" id="newRoomInp" placeholder="اسم القاعة الجديدة..."/>
+      <button class="save-btn" onclick="addRoom()">حفظ</button>
+      <button class="cancel-btn" onclick="toggleAdd()">×</button>
+    </div>` :
+    `<button class="add-btn" onclick="toggleAdd()">＋ إضافة قاعة جديدة</button>`;
+
+  html+=`<button class="export-btn" onclick="exportReport()">📊 تصدير التقرير الكامل</button>`;
+  if(reported.length) html+=`<button class="clear-btn" onclick="clearAll()">🗑️ مسح جميع التقارير</button>`;
+
+  document.getElementById('content').innerHTML=html;
+
+  if(showAdd){
+    const inp=document.getElementById('newRoomInp');
+    if(inp){ inp.focus(); inp.addEventListener('keydown',e=>{ if(e.key==='Enter') addRoom(); }); }
+  }
+}
+
+window.doRefresh = function(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spin');
+  setTimeout(()=>btn.classList.remove('spin'),700);
+};
+
+window.clearReport = async function(roomId){
+  await remove(ref(db,`reports/${roomId}`));
+  toast('🗑️ تم حذف التقرير');
+};
+
+window.clearAll = async function(){
+  if(!confirm('هل تريد مسح جميع التقارير؟')) return;
+  await remove(ref(db,'reports'));
+  toast('🗑️ تم مسح جميع التقارير');
+};
+
+window.toggleAdd = function(){ showAdd=!showAdd; renderAll(); };
+
+window.addRoom = async function(){
+  const inp=document.getElementById('newRoomInp');
+  const name=inp?.value.trim(); if(!name) return;
+  const id='R'+Date.now();
+  await set(ref(db,`rooms/${id}`),{id,name});
+  showAdd=false; toast('✅ تمت إضافة القاعة');
+};
+
+window.exportReport = function(){
+  const date=new Date().toLocaleDateString('ar');
+  const time=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+  let txt=`تقرير مراقبة الامتحانات\nالتاريخ: ${date}  الساعة: ${time}\n${'─'.repeat(42)}\n\n`;
+  let tG=0,tA=0;
+  rooms.forEach(room=>{
+    const r=reports[room.id];
+    if(r){
+      txt+=`✅ ${room.name}\n   الحارس: ${r.guardName||'غير محدد'}\n`;
+      txt+=`   الحراس: ${r.guards}  |  الغائبون: ${r.absent}\n`;
+      if(r.notes?.trim()) txt+=`   ملاحظة: ${r.notes}\n`;
+      txt+=`   وقت الإرسال: ${fmt(r.sentAt)}\n\n`;
+      tG+=r.guards; tA+=r.absent;
+    } else {
+      txt+=`⏳ ${room.name} — لم يرسل بعد\n\n`;
+    }
+  });
+  txt+=`${'─'.repeat(42)}\nالإجمالي: حراس=${tG}  |  غائبون=${tA}\n`;
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`تقرير_الامتحان_${date.replace(/\//g,'-')}.txt`; a.click();
+};
+
+init();
+</script>
+</body>
+</html>
