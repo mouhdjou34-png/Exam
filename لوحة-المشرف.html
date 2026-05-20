@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>لوحة المشرف</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="المشرف"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#060A12"/>
+<link rel="manifest" href="manifest-admin.json"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231D4ED8'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='110'%3E🖥️%3C/text%3E%3C/svg%3E"/>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -11,11 +18,39 @@ body{font-family:'Tajawal',sans-serif;background:#060A12;color:#E2E8F0;
   min-height:100vh;max-width:440px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden}
 ::-webkit-scrollbar{width:0}
 input,textarea,button{font-family:'Tajawal',sans-serif}
+
+/* SPLASH */
 #splash{position:fixed;inset:0;background:linear-gradient(160deg,#060A12,#0F2044,#1D4ED8);
   display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s}
 #splash h1{color:#fff;font-size:26px;font-weight:900;margin:14px 0 6px}
 #splash p{color:rgba(255,255,255,.5);font-size:13px}
 #splashStatus{margin-top:28px;color:rgba(255,255,255,.4);font-size:13px}
+.splash-icon{width:100px;height:100px;background:rgba(255,255,255,.1);border-radius:24px;
+  display:flex;align-items:center;justify-content:center;font-size:56px;
+  box-shadow:0 8px 32px rgba(29,78,216,.4)}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(160deg,#060A12,#0F2044,#1D4ED8);
+  display:none;flex-direction:column;align-items:center;justify-content:center;z-index:998;padding:24px}
+.login-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:24px;padding:32px 24px;width:100%;max-width:380px;text-align:center}
+.login-box h2{color:#fff;font-size:22px;font-weight:900;margin:12px 0 6px}
+.login-box p{color:rgba(255,255,255,.5);font-size:13px;margin-bottom:28px}
+.pin-row{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.pin-dot{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.15);
+  border:2px solid rgba(255,255,255,.2);transition:all .2s}
+.pin-dot.filled{background:#3B82F6;border-color:#3B82F6;transform:scale(1.1)}
+.pin-dot.error{background:#EF4444;border-color:#EF4444}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.num-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;color:#fff;font-size:22px;font-weight:700;padding:18px;cursor:pointer;
+  transition:transform .1s;line-height:1}
+.num-btn:active{transform:scale(.92);background:rgba(59,130,246,.3)}
+.num-btn.del{font-size:18px;color:#94A3B8}
+.num-btn.empty{background:transparent;border:none;cursor:default}
+.login-err{color:#F87171;font-size:13px;font-weight:600;margin-top:8px;min-height:20px}
+
+/* HEADER */
 .header{background:linear-gradient(150deg,#060A12 0%,#0D1D3A 50%,#1D4ED8 100%);
   padding:52px 16px 20px;position:relative;overflow:hidden}
 .header::before{content:'🎓';position:absolute;right:-8px;top:10px;font-size:100px;opacity:.05;transform:rotate(12deg)}
@@ -24,30 +59,37 @@ input,textarea,button{font-family:'Tajawal',sans-serif}
 .header-center small{color:rgba(147,197,253,.7);font-size:11px;font-weight:600;letter-spacing:.7px}
 .header-center h1{color:#fff;font-size:20px;font-weight:900}
 .refresh-btn{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);
-  color:#60A5FA;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:22px;
-  transition:transform .2s;line-height:1}
+  color:#60A5FA;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:22px;transition:transform .2s;line-height:1}
 .refresh-btn:active{transform:scale(.9)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin .7s linear infinite}
+
+/* TICKER */
 .ticker{background:rgba(59,130,246,.08);border-bottom:1px solid rgba(59,130,246,.12);
   padding:7px 16px;font-size:12px;color:#60A5FA;display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:pulse 1.8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 14px 0}
 .stat{background:#0D1421;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:11px 6px;text-align:center}
 .stat-ico{font-size:15px;margin-bottom:3px}
 .stat-val{font-size:21px;font-weight:900;line-height:1}
 .stat-lbl{color:#64748B;font-size:9px;margin-top:3px;line-height:1.4}
+
+/* PROGRESS */
 .prog-wrap{padding:13px 14px 0}
 .prog-hdr{display:flex;justify-content:space-between;margin-bottom:6px}
 .prog-track{background:rgba(255,255,255,.07);border-radius:6px;height:8px}
 .prog-fill{height:8px;border-radius:6px;background:linear-gradient(90deg,#3B82F6,#34D399);transition:width .6s ease}
+
+/* CONTENT */
 .content{padding:13px 14px 40px;flex:1;overflow-y:auto}
-.sec-title{font-size:11px;font-weight:700;letter-spacing:.6px;margin:14px 0 9px;
-  display:flex;align-items:center;gap:6px}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.6px;margin:14px 0 9px;display:flex;align-items:center;gap:6px}
+
+/* REPORT CARD */
 .rcard{background:#0D1421;border:1px solid rgba(255,255,255,.07);border-radius:16px;
-  padding:14px 13px 12px;margin-bottom:10px;border-right:3px solid #34D399;
-  animation:fadeIn .25s ease both}
+  padding:14px 13px 12px;margin-bottom:10px;border-right:3px solid #34D399;animation:fadeIn .25s ease both}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .rcard-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px}
 .rcard-info{flex:1}
@@ -59,14 +101,39 @@ input,textarea,button{font-family:'Tajawal',sans-serif}
 .pill{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:10px}
 .pill-v{font-size:19px;font-weight:800}
 .pill-l{font-size:11px;color:#64748B}
-.notes-box{margin-top:9px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.13);
-  border-radius:10px;padding:8px 10px}
+.notes-box{margin-top:9px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.13);border-radius:10px;padding:8px 10px}
 .notes-box p{color:#FCD34D;font-size:12px;line-height:1.6}
-.del-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#4B5563;padding:2px 4px}
-.pending-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
-.pend-item{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);
-  border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:5px}
-.pend-item span{color:#D97706;font-size:13px;font-weight:600}
+
+/* رأس التقرير مع أزرار الإجراءات */
+.rcard-actions{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)}
+.rcard-action-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;
+  font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.rcard-action-btn:active{transform:scale(.93)}
+.btn-edit-room{background:rgba(59,130,246,.12);color:#60A5FA;border:1px solid rgba(59,130,246,.25)}
+.btn-del-report{background:rgba(248,113,113,.1);color:#F87171;border:1px solid rgba(248,113,113,.22)}
+.btn-del-room{background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.25)}
+
+/* PENDING */
+.pending-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.pend-item{background:#0D1421;border:1px solid rgba(251,191,36,.15);
+  border-radius:12px;padding:10px 13px}
+.pend-item-row{display:flex;align-items:center;justify-content:space-between}
+.pend-item-name{color:#D97706;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.pend-actions{display:flex;gap:6px}
+.pend-edit{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);
+  color:#60A5FA;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.pend-del{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);
+  color:#F87171;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* EDIT INLINE */
+.edit-form{display:flex;gap:8px;margin-top:10px}
+.edit-inp{background:rgba(255,255,255,.06);border:1.5px solid rgba(59,130,246,.5);
+  border-radius:10px;color:#E2E8F0;font-size:14px;padding:9px 12px;outline:none;flex:1}
+.edit-inp:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.edit-save{background:#1D4ED8;border:none;border-radius:10px;color:#fff;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:700}
+.edit-cancel{background:rgba(255,255,255,.06);border:none;border-radius:10px;color:#64748B;padding:9px 12px;cursor:pointer;font-size:15px}
+
+/* BUTTONS */
 .add-btn{width:100%;padding:12px;background:rgba(255,255,255,.04);
   border:1px dashed rgba(255,255,255,.12);border-radius:14px;color:#64748B;
   font-size:14px;font-weight:600;cursor:pointer;margin-top:14px}
@@ -85,19 +152,102 @@ input[type=text]:focus{border-color:rgba(59,130,246,.4)}
 .clear-btn{width:100%;padding:12px;background:rgba(248,113,113,.07);
   border:1px solid rgba(248,113,113,.2);border-radius:14px;color:#F87171;
   font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.logout-btn{width:100%;padding:11px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);border-radius:14px;color:#475569;
+  font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
+
+/* TOAST */
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
   background:#065F46;color:#6EE7B7;padding:11px 22px;border-radius:20px;
   font-size:14px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
+
+/* MODAL تأكيد الحذف */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:9000;
+  opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#0D1421;border:1px solid rgba(255,255,255,.1);
+  border-radius:22px;padding:28px 22px;width:100%;max-width:340px;
+  text-align:center;transform:scale(.92);transition:transform .2s}
+.modal-overlay.open .modal-box{transform:scale(1)}
+.modal-ico{font-size:48px;margin-bottom:12px}
+.modal-title{color:#fff;font-size:18px;font-weight:900;margin-bottom:6px}
+.modal-msg{color:#94A3B8;font-size:13px;line-height:1.7;margin-bottom:22px}
+.modal-msg strong{color:#E2E8F0}
+.modal-actions{display:flex;gap:10px}
+.modal-confirm{flex:1;padding:13px;border:none;border-radius:13px;
+  background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;
+  font-size:15px;font-weight:800;cursor:pointer;transition:transform .1s}
+.modal-confirm:active{transform:scale(.96)}
+.modal-cancel{flex:1;padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:13px;
+  background:rgba(255,255,255,.05);color:#94A3B8;
+  font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+.modal-cancel:active{transform:scale(.96)}
+
+/* Install bar */
+.install-bar{background:linear-gradient(90deg,#1D4ED8,#2563EB);padding:10px 16px;
+  display:none;align-items:center;justify-content:space-between;gap:10px}
+.install-bar span{color:#fff;font-size:13px;font-weight:600}
+.install-btn-bar{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div id="splash">
-  <div style="font-size:70px">🖥️</div>
+  <div class="splash-icon">🖥️</div>
   <h1>لوحة المشرف</h1>
   <p>نظام مراقبة الامتحانات</p>
-  <div id="splashStatus">جاري الاتصال بالخادم...</div>
+  <div id="splashStatus">جاري التحقق...</div>
+</div>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:50px">🔐</div>
+    <h2>رمز المشرف</h2>
+    <p>أدخل الرمز السري للدخول</p>
+    <div class="pin-row" id="pinDots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="pressNum('1')">1</button>
+      <button class="num-btn" onclick="pressNum('2')">2</button>
+      <button class="num-btn" onclick="pressNum('3')">3</button>
+      <button class="num-btn" onclick="pressNum('4')">4</button>
+      <button class="num-btn" onclick="pressNum('5')">5</button>
+      <button class="num-btn" onclick="pressNum('6')">6</button>
+      <button class="num-btn" onclick="pressNum('7')">7</button>
+      <button class="num-btn" onclick="pressNum('8')">8</button>
+      <button class="num-btn" onclick="pressNum('9')">9</button>
+      <button class="num-btn empty"></button>
+      <button class="num-btn" onclick="pressNum('0')">0</button>
+      <button class="num-btn del" onclick="pressNum('del')">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تأكيد الحذف -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-ico" id="modalIco">🗑️</div>
+    <div class="modal-title" id="modalTitle">تأكيد الحذف</div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="modal-confirm" id="modalConfirmBtn">حذف</button>
+    </div>
+  </div>
+</div>
+
+<div id="installBar" class="install-bar">
+  <span>📲 أضف للشاشة الرئيسية</span>
+  <button class="install-btn-bar" id="installBtn">تثبيت</button>
 </div>
 
 <div id="mainApp" style="display:none;flex-direction:column;flex:1;min-height:100vh">
@@ -126,8 +276,8 @@ input[type=text]:focus{border-color:rgba(59,130,246,.4)}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, remove, onValue, push }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, remove, onValue }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -143,72 +293,120 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-let rooms   = [];
-let reports = {};
-let showAdd = false;
+const ADMIN_PIN = '1234';
+let rooms={}, reports={}, showAdd=false, editingRoom=null;
+let pinEntry='';
 
-function fmt(iso){ if(!iso)return''; const d=new Date(iso); return d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
-function now(){ return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
-function toast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+// ══ MODAL ══
+let pendingAction = null;
+
+window.closeModal = function(){
+  document.getElementById('deleteModal').classList.remove('open');
+  pendingAction = null;
+};
+
+function openModal(ico, title, msg, onConfirm){
+  document.getElementById('modalIco').textContent = ico;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').innerHTML = msg;
+  document.getElementById('modalConfirmBtn').onclick = ()=>{ closeModal(); onConfirm(); };
+  document.getElementById('deleteModal').classList.add('open');
 }
 
+document.getElementById('deleteModal').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
+
+// ══ PIN ══
+window.pressNum = function(v){
+  if(v==='del'){ pinEntry=pinEntry.slice(0,-1); }
+  else if(pinEntry.length<4){ pinEntry+=v; }
+  updateDots();
+  if(pinEntry.length===4) setTimeout(checkPin,200);
+};
+
+function updateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('d'+i);
+    d.className='pin-dot'+(i<pinEntry.length?' filled':'');
+  }
+}
+
+function checkPin(){
+  if(pinEntry===ADMIN_PIN){
+    document.getElementById('loginScreen').style.display='none';
+    startApp();
+  } else {
+    for(let i=0;i<4;i++) document.getElementById('d'+i).className='pin-dot error';
+    document.getElementById('loginErr').textContent='❌ رمز خاطئ، حاول مجدداً';
+    setTimeout(()=>{ pinEntry='';updateDots();
+      document.getElementById('loginErr').textContent=''; },900);
+  }
+}
+
+// ══ APP ══
+function fmt(iso){if(!iso)return'';const d=new Date(iso);return d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});}
+function now(){return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
 function hideSplash(){
-  const s=document.getElementById('splash'); s.style.opacity='0';
-  setTimeout(()=>{s.style.display='none'; document.getElementById('mainApp').style.display='flex';},400);
+  const s=document.getElementById('splash');s.style.opacity='0';
+  setTimeout(()=>{
+    s.style.display='none';
+    if(sessionStorage.getItem('adminAuth')==='1'){ startApp(); }
+    else { document.getElementById('loginScreen').style.display='flex'; }
+  },600);
+}
+
+function startApp(){
+  sessionStorage.setItem('adminAuth','1');
+  document.getElementById('mainApp').style.display='flex';
+  startListeners();
 }
 
 function startListeners(){
-  onValue(ref(db,'rooms'),(snap)=>{
-    rooms = snap.exists() ? Object.values(snap.val()) : [];
-    renderAll();
-  });
+  onValue(ref(db,'rooms'),(snap)=>{rooms=snap.exists()?snap.val():{};renderAll();});
   onValue(ref(db,'reports'),(snap)=>{
-    reports = snap.exists() ? snap.val() : {};
-    renderAll();
+    reports=snap.exists()?snap.val():{};renderAll();
     document.getElementById('tickerText').textContent=`آخر تحديث: ${now()} · مباشر 🟢`;
   });
 }
 
 async function init(){
   document.getElementById('splashStatus').textContent='جاري الاتصال...';
-  try{
-    startListeners();
-    hideSplash();
-  } catch(e){
-    document.getElementById('splashStatus').textContent='⚠️ فشل الاتصال، تحقق من الإنترنت';
-  }
+  try{ hideSplash(); }
+  catch(e){ document.getElementById('splashStatus').textContent='⚠️ فشل الاتصال'; }
 }
 
 function renderAll(){
-  const reported = rooms.filter(r=>reports[r.id]);
-  const pending  = rooms.filter(r=>!reports[r.id]);
-  const totalG   = Object.values(reports).reduce((s,r)=>s+(r.guards||0),0);
-  const totalA   = Object.values(reports).reduce((s,r)=>s+(r.absent||0),0);
-  const withN    = Object.values(reports).filter(r=>r.notes?.trim()).length;
-  const pct      = rooms.length ? Math.round(reported.length/rooms.length*100) : 0;
+  const roomArr=Object.values(rooms);
+  const reported=roomArr.filter(r=>reports[r.id]);
+  const pending=roomArr.filter(r=>!reports[r.id]);
+  const totalG=Object.values(reports).reduce((s,r)=>s+(r.guards||0),0);
+  const totalA=Object.values(reports).reduce((s,r)=>s+(r.absent||0),0);
+  const withN=Object.values(reports).filter(r=>r.notes?.trim()).length;
+  const pct=roomArr.length?Math.round(reported.length/roomArr.length*100):0;
 
   document.getElementById('statsRow').innerHTML=[
-    {ico:'✅',val:`${reported.length}/${rooms.length}`,lbl:'تقارير',col:'#34D399'},
+    {ico:'✅',val:`${reported.length}/${roomArr.length}`,lbl:'تقارير',col:'#34D399'},
     {ico:'👮',val:totalG,lbl:'الحراس',col:'#60A5FA'},
     {ico:'🚫',val:totalA,lbl:'الغائبون',col:'#F87171'},
     {ico:'📝',val:withN,lbl:'ملاحظات',col:'#FBBF24'},
-  ].map(s=>`<div class="stat">
-    <div class="stat-ico">${s.ico}</div>
+  ].map(s=>`<div class="stat"><div class="stat-ico">${s.ico}</div>
     <div class="stat-val" style="color:${s.col}">${s.val}</div>
-    <div class="stat-lbl">${s.lbl}</div>
-  </div>`).join('');
+    <div class="stat-lbl">${s.lbl}</div></div>`).join('');
 
   document.getElementById('pctText').textContent=pct+'%';
   document.getElementById('progFill').style.width=pct+'%';
 
   let html='';
 
+  // ─── التقارير الواردة ───
   if(reported.length){
     html+=`<div class="sec-title" style="color:#34D399">✅ التقارير الواردة (${reported.length})</div>`;
     html+=reported.map(room=>{
       const r=reports[room.id];
+      const isEditing = editingRoom === 'rep_'+room.id;
       return `<div class="rcard">
         <div class="rcard-top">
           <span style="font-size:22px">🏫</span>
@@ -217,7 +415,6 @@ function renderAll(){
             <div class="sub">👤 ${r.guardName||'غير محدد'}</div>
           </div>
           <span class="time-badge">🕐 ${fmt(r.sentAt)}</span>
-          <button class="del-btn" onclick="clearReport('${room.id}')">🗑️</button>
         </div>
         <div class="pills">
           <div class="pill" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)">
@@ -232,93 +429,171 @@ function renderAll(){
           </div>
         </div>
         ${r.notes?.trim()?`<div class="notes-box"><p>📝 ${r.notes}</p></div>`:''}
+        ${isEditing ? `
+        <div class="edit-form" style="margin-top:12px">
+          <input class="edit-inp" id="editInp_rep_${room.id}" value="${room.name}" placeholder="اسم جديد..."/>
+          <button class="edit-save" onclick="saveRoomName('${room.id}','rep_')">✓</button>
+          <button class="edit-cancel" onclick="cancelEdit()">×</button>
+        </div>` : `
+        <div class="rcard-actions">
+          <button class="rcard-action-btn btn-edit-room" onclick="startEdit('rep_${room.id}')">✏️ تغيير الاسم</button>
+          <button class="rcard-action-btn btn-del-report" onclick="confirmClearReport('${room.id}','${room.name}')">🗑️ حذف التقرير</button>
+          <button class="rcard-action-btn btn-del-room" onclick="confirmDeleteRoom('${room.id}','${room.name}')">❌ حذف القاعة</button>
+        </div>`}
       </div>`;
     }).join('');
   }
 
+  // ─── في انتظار التقرير ───
   if(pending.length){
     html+=`<div class="sec-title" style="color:#FBBF24">⏳ في انتظار التقرير (${pending.length})</div>
-    <div class="pending-grid">
-      ${pending.map(r=>`<div class="pend-item"><span style="font-size:14px">⏳</span><span>${r.name}</span></div>`).join('')}
-    </div>`;
+    <div class="pending-grid">`;
+    html+=pending.map(room=>{
+      const isEditing = editingRoom === room.id;
+      return `<div class="pend-item">
+        <div class="pend-item-row">
+          <div class="pend-item-name"><span>⏳</span>${room.name}</div>
+          <div class="pend-actions">
+            <button class="pend-edit" onclick="startEdit('${room.id}')">✏️ تعديل</button>
+            <button class="pend-del" onclick="confirmDeleteRoom('${room.id}','${room.name}')">🗑️</button>
+          </div>
+        </div>
+        ${isEditing ? `
+        <div class="edit-form">
+          <input class="edit-inp" id="editInp_${room.id}" value="${room.name}" placeholder="اسم جديد..."/>
+          <button class="edit-save" onclick="saveRoomName('${room.id}')">✓</button>
+          <button class="edit-cancel" onclick="cancelEdit()">×</button>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+    html+=`</div>`;
   }
 
-  if(!rooms.length){
+  if(!roomArr.length){
     html+=`<div style="text-align:center;padding:50px 20px;color:#374151">
       <div style="font-size:48px;margin-bottom:12px">📭</div>
       <p style="font-size:15px;font-weight:600">لا توجد قاعات بعد</p>
-      <p style="font-size:13px;margin-top:4px;color:#4B5563">أضف قاعات أدناه</p>
-    </div>`;
+      <p style="font-size:13px;margin-top:4px;color:#4B5563">أضف قاعات أدناه</p></div>`;
   }
 
-  html += showAdd ?
+  html+=showAdd?
     `<div class="add-form">
       <input type="text" id="newRoomInp" placeholder="اسم القاعة الجديدة..."/>
       <button class="save-btn" onclick="addRoom()">حفظ</button>
       <button class="cancel-btn" onclick="toggleAdd()">×</button>
-    </div>` :
+    </div>`:
     `<button class="add-btn" onclick="toggleAdd()">＋ إضافة قاعة جديدة</button>`;
 
   html+=`<button class="export-btn" onclick="exportReport()">📊 تصدير التقرير الكامل</button>`;
-  if(reported.length) html+=`<button class="clear-btn" onclick="clearAll()">🗑️ مسح جميع التقارير</button>`;
+  if(reported.length) html+=`<button class="clear-btn" onclick="confirmClearAll()">🗑️ مسح جميع التقارير</button>`;
+  html+=`<button class="logout-btn" onclick="doLogout()">🔒 تسجيل الخروج</button>`;
 
   document.getElementById('content').innerHTML=html;
 
   if(showAdd){
     const inp=document.getElementById('newRoomInp');
-    if(inp){ inp.focus(); inp.addEventListener('keydown',e=>{ if(e.key==='Enter') addRoom(); }); }
+    if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')addRoom();});}
+  }
+  if(editingRoom){
+    const key = editingRoom.startsWith('rep_')
+      ? 'editInp_rep_'+editingRoom.slice(4)
+      : 'editInp_'+editingRoom;
+    const inp=document.getElementById(key);
+    if(inp){
+      inp.focus();inp.select();
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){
+          const id=editingRoom.replace('rep_','');
+          saveRoomName(id, editingRoom.startsWith('rep_')?'rep_':'');
+        }
+      });
+    }
   }
 }
 
-window.doRefresh = function(){
-  const btn=document.getElementById('refreshBtn');
-  btn.classList.add('spin');
-  setTimeout(()=>btn.classList.remove('spin'),700);
+window.doRefresh=function(){const btn=document.getElementById('refreshBtn');btn.classList.add('spin');setTimeout(()=>btn.classList.remove('spin'),700);};
+
+// ── حذف تقرير واحد ──
+window.confirmClearReport=function(id, name){
+  openModal('🗑️','حذف التقرير',
+    `سيتم حذف تقرير القاعة <strong>${name}</strong> فقط، والقاعة ستبقى في القائمة.`,
+    async ()=>{ await remove(ref(db,`reports/${id}`)); toast('🗑️ تم حذف التقرير'); }
+  );
 };
 
-window.clearReport = async function(roomId){
-  await remove(ref(db,`reports/${roomId}`));
-  toast('🗑️ تم حذف التقرير');
+// ── حذف قاعة كاملاً ──
+window.confirmDeleteRoom=function(id, name){
+  openModal('❌','حذف القاعة نهائياً',
+    `سيتم حذف القاعة <strong>${name}</strong> وتقريرها نهائياً.<br/><span style="color:#F87171;font-size:12px">لا يمكن التراجع عن هذا الإجراء.</span>`,
+    async ()=>{
+      await remove(ref(db,`rooms/${id}`));
+      await remove(ref(db,`reports/${id}`));
+      if(editingRoom===id||editingRoom==='rep_'+id) editingRoom=null;
+      toast('🗑️ تم حذف القاعة نهائياً');
+    }
+  );
 };
 
-window.clearAll = async function(){
-  if(!confirm('هل تريد مسح جميع التقارير؟')) return;
-  await remove(ref(db,'reports'));
-  toast('🗑️ تم مسح جميع التقارير');
+// ── مسح جميع التقارير ──
+window.confirmClearAll=function(){
+  openModal('⚠️','مسح جميع التقارير',
+    `سيتم مسح <strong>جميع التقارير الواردة</strong> مع الإبقاء على القاعات.`,
+    async ()=>{ await remove(ref(db,'reports')); toast('🗑️ تم مسح جميع التقارير'); }
+  );
 };
 
-window.toggleAdd = function(){ showAdd=!showAdd; renderAll(); };
+window.toggleAdd=function(){showAdd=!showAdd;editingRoom=null;renderAll();};
+window.startEdit=function(id){editingRoom=id;showAdd=false;renderAll();};
+window.cancelEdit=function(){editingRoom=null;renderAll();};
 
-window.addRoom = async function(){
+window.saveRoomName=async function(id,prefix=''){
+  const key=prefix==='rep_'?'editInp_rep_'+id:'editInp_'+id;
+  const inp=document.getElementById(key);
+  const name=inp?.value.trim();
+  if(!name)return;
+  await set(ref(db,`rooms/${id}/name`),name);
+  editingRoom=null;
+  toast('✅ تم تغيير اسم القاعة');
+};
+
+window.addRoom=async function(){
   const inp=document.getElementById('newRoomInp');
-  const name=inp?.value.trim(); if(!name) return;
+  const name=inp?.value.trim();if(!name)return;
   const id='R'+Date.now();
   await set(ref(db,`rooms/${id}`),{id,name});
-  showAdd=false; toast('✅ تمت إضافة القاعة');
+  showAdd=false;toast('✅ تمت إضافة القاعة');
 };
 
-window.exportReport = function(){
+window.doLogout=function(){
+  sessionStorage.removeItem('adminAuth');
+  pinEntry='';updateDots();
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+};
+
+window.exportReport=function(){
+  const roomArr=Object.values(rooms);
   const date=new Date().toLocaleDateString('ar');
   const time=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
   let txt=`تقرير مراقبة الامتحانات\nالتاريخ: ${date}  الساعة: ${time}\n${'─'.repeat(42)}\n\n`;
   let tG=0,tA=0;
-  rooms.forEach(room=>{
-    const r=reports[room.id];
-    if(r){
-      txt+=`✅ ${room.name}\n   الحارس: ${r.guardName||'غير محدد'}\n`;
-      txt+=`   الحراس: ${r.guards}  |  الغائبون: ${r.absent}\n`;
-      if(r.notes?.trim()) txt+=`   ملاحظة: ${r.notes}\n`;
-      txt+=`   وقت الإرسال: ${fmt(r.sentAt)}\n\n`;
-      tG+=r.guards; tA+=r.absent;
-    } else {
-      txt+=`⏳ ${room.name} — لم يرسل بعد\n\n`;
-    }
+  roomArr.forEach(room=>{const r=reports[room.id];
+    if(r){txt+=`✅ ${room.name}\n   الحارس: ${r.guardName||'غير محدد'}\n   الحراس: ${r.guards}  |  الغائبون: ${r.absent}\n`;
+      if(r.notes?.trim())txt+=`   ملاحظة: ${r.notes}\n`;
+      txt+=`   وقت الإرسال: ${fmt(r.sentAt)}\n\n`;tG+=r.guards;tA+=r.absent;
+    }else{txt+=`⏳ ${room.name} — لم يرسل بعد\n\n`;}
   });
   txt+=`${'─'.repeat(42)}\nالإجمالي: حراس=${tG}  |  غائبون=${tA}\n`;
   const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`تقرير_الامتحان_${date.replace(/\//g,'-')}.txt`; a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`تقرير_${date.replace(/\//g,'-')}.txt`;a.click();
 };
+
+// PWA
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBar').style.display='flex';});
+document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;if(outcome==='accepted')document.getElementById('installBar').style.display='none';deferredPrompt=null;});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 init();
 </script>
