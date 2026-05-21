@@ -9,7 +9,6 @@
 <meta name="apple-mobile-web-app-title" content="عضو الاتصال"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#0D1117"/>
-<meta name="description" content="نظام مراقبة الامتحانات - تطبيق عضو الاتصال"/>
 <link rel="manifest" href="manifest-guard.json"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231E3A8A'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='110'%3E📞%3C/text%3E%3C/svg%3E"/>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
@@ -51,6 +50,11 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
 .install-bar{background:#1F6FEB;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;}
 .install-bar span{color:#fff;font-size:12px;font-weight:700;}
 .install-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
+/* تصميم خانات الغياب الديناميكية */
+.absent-fields-container {display:flex; flex-direction:column; gap:10px; margin-top:12px;}
+.absent-student-row {background:#0D1117; border:1px dashed #30363D; padding:10px; border-radius:10px;}
+.absent-student-title {font-size:11px; color:#58A6FF; font-weight:bold; margin-bottom:6px;}
+.absent-grid {display:grid; grid-template-columns: 1.3fr 1fr; gap:8px;}
 </style>
 </head>
 <body>
@@ -87,13 +91,13 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
     <div class="label">📚 اسم المادة الحالية:</div>
     <input type="text" id="subjectInp" class="input-field" placeholder="مثال: رياضيات، لغة عربية..." style="margin-bottom: 12px;"/>
 
-    <div class="label">👤 اسم رئيس القاعة:</div>
-    <input type="text" id="guardInp" class="input-field" placeholder="اكتب اسم رئيس القاعة..."/>
+    <div class="label">👤 اسم عضو الاتصال (المُرسِل):</div>
+    <input type="text" id="guardInp" class="input-field" placeholder="اكتب اسمك الثلاثي الكامل..."/>
   </div>
 
   <div class="card" style="display:flex; flex-direction:column; gap:14px;">
     <div>
-      <div class="label">👮 عدد الحراس المتواجدين حالياً:</div>
+      <div class="label">👮 عدد الحراس المتواجدين بالقاعة:</div>
       <div class="counter-box">
         <button class="counter-btn btn-minus" onclick="step('guards',-1)">-</button>
         <div class="counter-val" id="guardsVal">0</div>
@@ -102,12 +106,13 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
     </div>
     
     <div>
-      <div class="label">🚫 عدد الأساتذة الغائبين:</div>
+      <div class="label">🚫 عدد التلاميذ الغائبين:</div>
       <div class="counter-box">
-        <button class="counter-btn btn-minus" onclick="step('absent',-1)">-</button>
+        <button class="counter-btn btn-minus" onclick="stepAbs(-1)">-</button>
         <div class="counter-val" id="absentVal">0</div>
-        <button class="counter-btn btn-plus" onclick="step('absent',1)">+</button>
+        <button class="counter-btn btn-plus" onclick="stepAbs(1)">+</button>
       </div>
+      <div class="absent-fields-container" id="absentFieldsContainer"></div>
     </div>
   </div>
 
@@ -164,44 +169,58 @@ function fmt(iso){
   return new Date(iso).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
 }
 
-// تشغيل الواجهة وإخفاء شاشة التحميل
 onValue(ref(db, 'rooms'), (snap) => {
   state.rooms = snap.exists() ? snap.val() : {};
   const select = document.getElementById('roomSelect');
-  
-  // الاحتفاظ بالاختيار الحالي إن وُجد
   const currSel = select.value;
   select.innerHTML = '<option value="">-- اضغط للاختيار --</option>';
   
   Object.values(state.rooms).forEach(r => {
     const option = document.createElement('option');
     option.value = r.id;
-    // إذا كانت القاعة مخصصة لعضو معين في لوحة التحكم تظهر باسمه
-    option.textContent = r.name + (r.memberName ? ` [عضو الاتصال: ${r.memberName}]` : '');
+    option.textContent = r.name + (r.memberName ? ` [تخصيص: ${r.memberName}]` : '');
     select.appendChild(option);
   });
   
   if(currSel && state.rooms[currSel]) select.value = currSel;
-  
   document.getElementById('subHeader').textContent = '✅ جاهز لإرسال التقارير';
   const sp = document.getElementById('splash');
   if(sp){ sp.style.opacity='0'; setTimeout(()=>sp.remove(), 400); }
 });
 
-// التعامل مع العدادات الحركية
 window.step = function(key, val){
   state[key] = Math.max(0, state[key] + val);
   document.getElementById(key+'Val').textContent = state[key];
 };
 
-// تفعيل الزر عند اختيار قاعة
+// التحكم في عداد غياب التلاميذ وإنشاء خانات الأسماء بشكل ديناميكي
+window.stepAbs = function(val) {
+  state.absent = Math.max(0, state.absent + val);
+  document.getElementById('absentVal').textContent = state.absent;
+  
+  const container = document.getElementById('absentFieldsContainer');
+  container.innerHTML = '';
+  
+  for(let i = 1; i <= state.absent; i++) {
+    const row = document.createElement('div');
+    row.className = 'absent-student-row';
+    row.innerHTML = `
+      <div class="absent-student-title">التلميذ الغائب رقم (${i})</div>
+      <div class="absent-grid">
+         <input type="text" class="input-field abs-name" placeholder="الاسم واللقب..." style="padding:8px; font-size:12px;"/>
+         <input type="text" class="input-field abs-reg" placeholder="رقم التسجيل..." style="padding:8px; font-size:12px;"/>
+      </div>
+    `;
+    container.appendChild(row);
+  }
+};
+
 window.onRoomChange = function(){
   const id = document.getElementById('roomSelect').value;
   state.room = state.rooms[id] || null;
   document.getElementById('sendBtn').disabled = !state.room;
 };
 
-// آلية إرسال التقرير الفورية للمشرف
 window.sendReport = async function(){
   if(!state.room) return;
   const btn = document.getElementById('sendBtn');
@@ -212,6 +231,27 @@ window.sendReport = async function(){
     toast('⚠️ يرجى كتابة اسم المادة أولاً', false);
     return;
   }
+  if(!guardName) {
+    toast('⚠️ يرجى كتابة اسم عضو الاتصال المُرسِل', false);
+    return;
+  }
+  
+  // تجميع قائمة التلاميذ الغائبين من الحقول الديناميكية
+  const studentNames = document.querySelectorAll('.abs-name');
+  const studentRegs = document.querySelectorAll('.abs-reg');
+  let absentStudentsList = [];
+  
+  for(let i=0; i<studentNames.length; i++) {
+     const nameVal = studentNames[i].value.trim();
+     const regVal = studentRegs[i].value.trim();
+     if(nameVal || regVal) {
+        absentStudentsList.push({
+           index: i+1,
+           fullName: nameVal || "لم يكتب",
+           regNumber: regVal || "لم يكتب"
+        });
+     }
+  }
   
   btn.disabled = true;
   btn.textContent = '⏳ جاري الإرسال المباشر...';
@@ -220,9 +260,10 @@ window.sendReport = async function(){
     roomId: state.room.id,
     roomName: state.room.name,
     subjectName: subjectName,
-    guardName: guardName || "غير محدد",
+    guardName: guardName, // اسم عضو الاتصال
     guards: state.guards,
     absent: state.absent,
+    absentStudents: absentStudentsList, // مصفوفة غيابات التلاميذ المضافة حديثاً
     notes: document.getElementById('notesInp').value.trim(),
     sentAt: new Date().toISOString()
   };
@@ -235,23 +276,23 @@ window.sendReport = async function(){
     btn.classList.add('ok');
     
     document.getElementById('lastBadge').style.display = 'flex';
-    document.getElementById('lastBadgeText').textContent = `آخر تقرير أرسل الساعة: ${fmt(report.sentAt)} | المادة: ${report.subjectName} | حراس: ${report.guards} | غائب: ${report.absent}`;
+    document.getElementById('lastBadgeText').textContent = `آخر تقرير: ${fmt(report.sentAt)} | المادة: ${report.subjectName} | حراس: ${report.guards} | غياب التلاميذ: ${report.absent}`;
     
-    // إعادة تعيين الحقول تمهيداً للفترة القادمة
-    document.getElementById('guardInp').value = '';
+    // تصغير الحقول وإعادة تصفير العدادات الديناميكية لقادم الفترات
     document.getElementById('notesInp').value = '';
     state.guards = 0; state.absent = 0;
     document.getElementById('guardsVal').textContent = '0';
     document.getElementById('absentVal').textContent = '0';
+    document.getElementById('absentFieldsContainer').innerHTML = '';
     
     setTimeout(() => {
       btn.textContent = '📤 إرسال تقرير جديد';
       btn.classList.remove('ok');
       btn.disabled = false;
-    }, 3000);
+    }, 2500);
     
   } catch(e) {
-    toast('❌ فشل الإرسال المباشر، تحقق من الإنترنت', false);
+    toast('❌ فشل الإرسال، تحقق من الشبكة', false);
     btn.textContent = '📤 إعادة محاولة الإرسال';
     btn.disabled = false;
   }
@@ -260,7 +301,6 @@ window.sendReport = async function(){
 window.addEventListener('online', () => document.getElementById('offlineBar').style.display = 'none');
 window.addEventListener('offline', () => document.getElementById('offlineBar').style.display = 'block');
 
-// PWA Install
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); deferredPrompt = e;
