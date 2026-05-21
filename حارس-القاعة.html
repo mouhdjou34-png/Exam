@@ -3,166 +3,126 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>تطبيق الحارس</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<title>تطبيق عضو الاتصال</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="عضو الاتصال"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0D1117"/>
+<meta name="description" content="نظام مراقبة الامتحانات - تطبيق عضو الاتصال"/>
+<link rel="manifest" href="manifest-guard.json"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231E3A8A'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='110'%3E📞%3C/text%3E%3C/svg%3E"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Tajawal',sans-serif;background:#0D1117;color:#E6EDF3;
-  min-height:100vh;max-width:430px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden}
-::-webkit-scrollbar{width:0}
-input,textarea,button{font-family:'Tajawal',sans-serif}
-#splash{position:fixed;inset:0;background:linear-gradient(160deg,#0D1117,#1B4332,#2D6A4F);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:999;transition:opacity .4s}
-#splash h1{color:#fff;font-size:28px;font-weight:900;margin:16px 0 6px}
-#splash p{color:rgba(255,255,255,.55);font-size:14px}
-#configScreen{display:none;flex-direction:column;flex:1}
-.config-hero{background:linear-gradient(160deg,#0D1117,#1B4332);padding:60px 24px 30px;text-align:center}
-.config-hero .icon{font-size:60px;margin-bottom:14px}
-.config-hero h1{color:#fff;font-size:22px;font-weight:900;margin-bottom:6px}
-.config-hero p{color:rgba(255,255,255,.5);font-size:13px;line-height:1.7}
-.config-body{padding:24px 16px 40px;flex:1}
-.field-label{color:#8B949E;font-size:12px;font-weight:700;letter-spacing:.6px;margin-bottom:7px}
-.field-wrap{margin-bottom:14px}
-input[type=text]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  border-radius:12px;color:#E6EDF3;font-size:14px;padding:13px 14px;outline:none}
-input[type=text]:focus{border-color:rgba(63,185,80,.5)}
-.room-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:6px}
-.room-tile{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);
-  border-radius:13px;padding:13px 10px;cursor:pointer;display:flex;align-items:center;gap:7px;
-  transition:all .15s}
-.room-tile:active{transform:scale(.95)}
-.room-tile.sel{border-color:#3FB950;background:rgba(63,185,80,.1)}
-.room-tile span{color:#E6EDF3;font-size:13px;font-weight:600}
-.big-btn{width:100%;padding:16px;border:none;border-radius:16px;color:#fff;
-  font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;
-  background:linear-gradient(135deg,#2D6A4F,#40916C);
-  box-shadow:0 6px 20px rgba(45,106,79,.4);transition:transform .1s}
-.big-btn:active{transform:scale(.97)}
-.big-btn:disabled{background:rgba(255,255,255,.07);color:#4B5563;box-shadow:none}
-#formScreen{display:none;flex-direction:column;flex:1}
-.header{padding:52px 16px 18px;position:relative;overflow:hidden}
-.header-guard{background:linear-gradient(135deg,#1B4332,#2D6A4F)}
-.header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-.back-btn{background:rgba(255,255,255,.13);border:none;color:#fff;border-radius:10px;
-  padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600}
-.header-center{text-align:center;flex:1}
-.header-center small{color:rgba(255,255,255,.6);font-size:11px;font-weight:600}
-.header-center h1{color:#fff;font-size:20px;font-weight:900}
-.last-badge{background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.2);
-  border-radius:10px;padding:8px 12px;margin-top:12px;display:flex;align-items:center;gap:8px;
-  position:relative;z-index:1}
-.last-badge span{color:#6EE7B7;font-size:12px;font-weight:600}
-.form-body{padding:18px 16px 110px;flex:1;overflow-y:auto}
-.card{background:#161B22;border:1px solid rgba(255,255,255,.07);border-radius:18px;
-  padding:18px 16px;margin-bottom:13px}
-.card-head{display:flex;align-items:center;gap:9px;margin-bottom:15px}
-.card-head .ico{font-size:22px}
-.card-head h2{color:#E2E8F0;font-size:15px;font-weight:700}
-.counter{display:flex;align-items:center;justify-content:center;gap:22px}
-.cnt-btn{width:54px;height:54px;border-radius:16px;border:none;color:#fff;
-  font-size:28px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:transform .1s}
-.cnt-btn:active{transform:scale(.88)}
-.cnt-val{font-size:56px;font-weight:900;min-width:72px;text-align:center;line-height:1}
-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-  border-radius:12px;color:#E6EDF3;font-size:14px;padding:12px 14px;outline:none;resize:none;line-height:1.7}
-textarea:focus{border-color:rgba(251,191,36,.4)}
-.bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;background:rgba(13,17,23,.97);
-  backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);
-  padding:14px 16px 28px}
-.submit-btn{width:100%;padding:16px;border:none;border-radius:16px;color:#fff;
-  font-size:16px;font-weight:800;cursor:pointer;
-  background:linear-gradient(135deg,#2D6A4F,#1B7A5A);
-  box-shadow:0 6px 20px rgba(45,106,79,.4);transition:transform .1s}
-.submit-btn:active{transform:scale(.97)}
-.submit-btn.ok{background:linear-gradient(135deg,#065F46,#047857)!important}
-.submit-btn:disabled{opacity:.6}
-.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
-  background:#065F46;color:#6EE7B7;padding:11px 22px;border-radius:20px;
-  font-size:14px;font-weight:700;border:1px solid rgba(110,231,183,.3);
-  opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
-.toast.show{opacity:1}
-.offline-bar{background:#7F1D1D;color:#FCA5A5;padding:8px 16px;
-  font-size:12px;font-weight:600;text-align:center;display:none}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Tajawal',sans-serif;background:#0D1117;color:#C9D1D9;min-height:100vh;max-width:440px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden;}
+input,textarea,button,select{font-family:'Tajawal',sans-serif;}
+.splash{position:fixed;inset:0;background:linear-gradient(160deg,#0D1117,#161B22,#1E3A8A);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s;}
+.splash h1{color:#fff;font-size:24px;font-weight:900;margin-top:16px;}
+.splash p{color:#8B949E;font-size:13px;margin-top:4px;}
+.sp-ico{width:90px;height:90px;background:rgba(255,255,255,0.05);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 8px 24px rgba(30,58,138,0.3);}
+.header{background:linear-gradient(135deg,#161B22 0%,#1E3A8A 100%);padding:50px 20px 25px;text-align:center;border-bottom:1px solid #21262D;position:relative;}
+.header h1{font-size:20px;color:#fff;font-weight:900;}
+.header p{font-size:12px;color:#58A6FF;margin-top:2px;font-weight:700;}
+.offline-bar{background:#7A1E1E;color:#FF7B72;padding:6px;text-align:center;font-size:11px;font-weight:700;display:none;}
+.container{padding:16px 20px 40px;flex:1;display:flex;flex-direction:column;gap:16px;}
+.card{background:#161B22;border:1px solid #21262D;border-radius:16px;padding:16px;}
+.label{font-size:13px;font-weight:700;color:#8B949E;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.select-room, .input-field{width:100%;background:#0D1117;border:1px solid #30363D;border-radius:12px;color:#C9D1D9;padding:12px;font-size:15px;font-weight:700;outline:none;appearance:none;-webkit-appearance:none;transition:border-color .2s;}
+.select-room:focus, .input-field:focus{border-color:#58A6FF;}
+.select-wrap{position:relative;}
+.select-wrap::after{content:'▼';font-size:10px;color:#8B949E;position:absolute;left:14px;top:16px;pointer-events:none;}
+.counter-box{display:flex;align-items:center;justify-content:space-between;background:#0D1117;padding:10px 14px;border-radius:12px;border:1px solid #21262D;margin-top:4px;}
+.counter-btn{width:42px;height:42px;border-radius:10px;border:none;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;}
+.counter-btn:active{transform:scale(0.9);}
+.btn-minus{background:#21262D;color:#C9D1D9;}
+.btn-plus{background:#1F6FEB;color:#fff;}
+.counter-val{font-size:26px;font-weight:900;color:#fff;min-width:40px;text-align:center;}
+.textarea{width:100%;background:#0D1117;border:1px solid #30363D;border-radius:12px;color:#C9D1D9;padding:12px;font-size:14px;outline:none;resize:none;height:70px;}
+.textarea:focus{border-color:#58A6FF;}
+.send-btn{width:100%;padding:14px;background:linear-gradient(135deg,#1F6FEB,#238636);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(31,111,235,0.2);transition:all .2s;margin-top:10px;}
+.send-btn:active{transform:scale(0.97);}
+.send-btn:disabled{background:#21262D;color:#8B949E;box-shadow:none;cursor:not-allowed;}
+.send-btn.ok{background:#238636;}
+.last-badge{background:rgba(35,134,54,0.1);border:1px solid rgba(56,139,60,0.2);border-radius:12px;padding:12px;display:none;align-items:center;gap:10px;color:#56D364;font-size:12px;font-weight:700;line-height:1.5;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1F6FEB;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,0.3);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;text-align:center;white-space:nowrap;}
+.toast.err{background:#A71D5D;}
+.toast.show{opacity:1;}
+.install-bar{background:#1F6FEB;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;}
+.install-bar span{color:#fff;font-size:12px;font-weight:700;}
+.install-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<div id="splash">
-  <div style="font-size:70px">👮</div>
-  <h1>تطبيق الحارس</h1>
-  <p>نظام مراقبة الامتحانات</p>
-  <div style="margin-top:28px;color:rgba(255,255,255,.4);font-size:13px" id="splashStatus">جاري الاتصال...</div>
+<div class="splash" id="splash">
+  <div class="sp-ico">📞</div>
+  <h1>تطبيق عضو الاتصال</h1>
+  <p>نظام مراقبة الامتحانات الرقمي</p>
 </div>
 
-<div class="offline-bar" id="offlineBar">⚠️ لا يوجد اتصال بالإنترنت — سيُرسَل التقرير عند عودة الاتصال</div>
+<div id="offlineBar" class="offline-bar">⚠️ أنت غير متصل بالإنترنت، سيتم الإرسال فور عودة الشبكة</div>
 
-<div id="configScreen" style="display:flex">
-  <div class="config-hero">
-    <div class="icon">🏫</div>
-    <h1>مرحباً بك</h1>
-    <p>أدخل اسمك واختر قاعتك<br/>للبدء في إرسال التقارير</p>
-  </div>
-  <div class="config-body">
-    <div class="field-wrap">
-      <div class="field-label">👤 اسم الحارس</div>
-      <input type="text" id="guardNameInp" placeholder="أدخل اسمك الكامل..."/>
-    </div>
-    <div class="field-wrap">
-      <div class="field-label">🏫 اختر القاعة</div>
-      <div class="room-grid" id="roomGrid"></div>
-    </div>
-    <button class="big-btn" id="startBtn" disabled onclick="startForm()">▶ دخول القاعة</button>
-  </div>
+<div id="installBar" class="install-bar">
+  <span>📲 أضف التطبيق للشاشة الرئيسية</span>
+  <button class="install-btn" id="installBtn">تثبيت</button>
 </div>
 
-<div id="formScreen">
-  <div class="header header-guard">
-    <div class="header-top">
-      <button class="back-btn" onclick="goConfig()">← رجوع</button>
-      <div class="header-center">
-        <small>حارس القاعة</small>
-        <h1 id="formRoomTitle">—</h1>
-      </div>
-      <div style="width:72px"></div>
-    </div>
-    <div id="guardInfo" style="text-align:center;margin-top:8px;position:relative;z-index:1"></div>
-    <div id="lastBadge" style="display:none" class="last-badge">
-      <span>🕐</span><span id="lastBadgeText"></span>
+<div class="header">
+  <h1>📞 تطبيق عضو الاتصال</h1>
+  <p id="subHeader">جاري تحميل القاعات المتاحة...</p>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="label">🏢 اختر القاعة المسؤولة:</div>
+    <div class="select-wrap">
+      <select class="select-room" id="roomSelect" onchange="onRoomChange()">
+        <option value="">-- اضغط للاختيار --</option>
+      </select>
     </div>
   </div>
 
-  <div class="form-body">
-    <div class="card" style="border-right:3px solid #3FB950">
-      <div class="card-head"><span class="ico">👮</span><h2>عدد الحراس في القاعة</h2></div>
-      <div class="counter">
-        <button class="cnt-btn" style="background:#1B4332" ontouchstart="" onclick="change('g',-1)">−</button>
-        <div><div class="cnt-val" style="color:#3FB950" id="gVal">1</div>
-          <div style="color:#4B5563;font-size:11px;text-align:center">حارس</div></div>
-        <button class="cnt-btn" style="background:#2D6A4F" ontouchstart="" onclick="change('g',1)">+</button>
+  <div class="card">
+    <div class="label">📚 اسم المادة الحالية:</div>
+    <input type="text" id="subjectInp" class="input-field" placeholder="مثال: رياضيات، لغة عربية..." style="margin-bottom: 12px;"/>
+
+    <div class="label">👤 اسم رئيس القاعة:</div>
+    <input type="text" id="guardInp" class="input-field" placeholder="اكتب اسم رئيس القاعة..."/>
+  </div>
+
+  <div class="card" style="display:flex; flex-direction:column; gap:14px;">
+    <div>
+      <div class="label">👮 عدد الحراس المتواجدين حالياً:</div>
+      <div class="counter-box">
+        <button class="counter-btn btn-minus" onclick="step('guards',-1)">-</button>
+        <div class="counter-val" id="guardsVal">0</div>
+        <button class="counter-btn btn-plus" onclick="step('guards',1)">+</button>
       </div>
     </div>
-
-    <div class="card" style="border-right:3px solid #F87171">
-      <div class="card-head"><span class="ico">🚫</span><h2>عدد التلاميذ الغائبين</h2></div>
-      <div class="counter">
-        <button class="cnt-btn" style="background:#7F1D1D" ontouchstart="" onclick="change('a',-1)">−</button>
-        <div><div class="cnt-val" style="color:#8B949E" id="aVal">0</div>
-          <div style="color:#4B5563;font-size:11px;text-align:center">غائب</div></div>
-        <button class="cnt-btn" style="background:#991B1B" ontouchstart="" onclick="change('a',1)">+</button>
+    
+    <div>
+      <div class="label">🚫 عدد الأساتذة الغائبين:</div>
+      <div class="counter-box">
+        <button class="counter-btn btn-minus" onclick="step('absent',-1)">-</button>
+        <div class="counter-val" id="absentVal">0</div>
+        <button class="counter-btn btn-plus" onclick="step('absent',1)">+</button>
       </div>
-    </div>
-
-    <div class="card" style="border-right:3px solid #FBBF24">
-      <div class="card-head"><span class="ico">📝</span><h2>ملاحظات</h2></div>
-      <textarea id="notesInp" rows="3" placeholder="غش، حادثة، مشكلة تقنية..."></textarea>
     </div>
   </div>
 
-  <div class="bottom-bar">
-    <button class="submit-btn" id="submitBtn" onclick="submitReport()">📤 إرسال التقرير</button>
+  <div class="card">
+    <div class="label">📝 ملاحظات أو أحداث طارئة (اختياري):</div>
+    <textarea id="notesInp" class="textarea" placeholder="اكتب أي ملاحظات تخص سير الامتحان في القاعة هنا..."></textarea>
+  </div>
+
+  <div>
+    <button class="send-btn" id="sendBtn" onclick="sendReport()" disabled>📤 إرسال التقرير للمشرف العام</button>
+  </div>
+
+  <div class="last-badge" id="lastBadge">
+    <div style="font-size:20px">✨</div>
+    <div id="lastBadgeText"></div>
   </div>
 </div>
 
@@ -170,139 +130,150 @@ textarea:focus{border-color:rgba(251,191,36,.4)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyD62It05IMsn3nXYo0B38sqXm4IQB6PGzc",
-  authDomain:        "amana-989c9.firebaseapp.com",
-  databaseURL:       "https://amana-989c9-default-rtdb.firebaseio.com",
-  projectId:         "amana-989c9",
-  storageBucket:     "amana-989c9.firebasestorage.app",
+  apiKey: "AIzaSyD62It05IMsn3nXYo0B38sqXm4IQB6PGzc",
+  authDomain: "amana-989c9.firebaseapp.com",
+  databaseURL: "https://amana-989c9-default-rtdb.firebaseio.com",
+  projectId: "amana-989c9",
+  storageBucket: "amana-989c9.firebasestorage.app",
   messagingSenderId: "796537653849",
-  appId:             "1:796537653849:web:3a5d394f3ab71a8f2c6b1e"
+  appId: "1:796537653849:web:3a5d394f3ab71a8f2c6b1e"
 };
 
 const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+const db = getDatabase(app);
 
-let state = { room:null, guardName:'', guards:1, absent:0, notes:'' };
-let rooms = [];
-
-function fmt(iso){ if(!iso)return''; const d=new Date(iso); return d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
-function toast(msg,ok=true){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.background=ok?'#065F46':'#7F1D1D';
-  t.style.color=ok?'#6EE7B7':'#FCA5A5'; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-async function loadRooms(){
-  document.getElementById('splashStatus').textContent='جاري تحميل القاعات...';
-  try{
-    const snap = await get(ref(db,'rooms'));
-    if(snap.exists()) rooms = Object.values(snap.val());
-    else {
-      rooms=[
-        {id:'A1',name:'قاعة A1'},{id:'A2',name:'قاعة A2'},
-        {id:'B1',name:'قاعة B1'},{id:'B2',name:'قاعة B2'},
-        {id:'C1',name:'قاعة C1'},{id:'C2',name:'قاعة C2'},
-      ];
-      const obj={};rooms.forEach(r=>obj[r.id]=r);
-      await set(ref(db,'rooms'),obj);
-    }
-    renderRooms();
-    hideSplash();
-  } catch(e){
-    document.getElementById('splashStatus').textContent='⚠️ تحقق من الإنترنت وأعد تحميل الصفحة';
-    console.error(e);
-  }
-}
-
-function hideSplash(){
-  const s=document.getElementById('splash');
-  s.style.opacity='0'; setTimeout(()=>s.style.display='none',400);
-}
-
-function renderRooms(){
-  const grid=document.getElementById('roomGrid');
-  grid.innerHTML=rooms.map(r=>`
-    <div class="room-tile ${state.room?.id===r.id?'sel':''}" onclick="selectRoom('${r.id}')">
-      <span style="font-size:20px">🏫</span><span>${r.name}</span>
-    </div>`).join('');
-}
-
-window.selectRoom = function(id){
-  state.room=rooms.find(r=>r.id===id);
-  renderRooms();
-  document.getElementById('startBtn').disabled=!state.room;
+const state = {
+  rooms: {},
+  room: null,
+  guards: 0,
+  absent: 0
 };
 
-document.getElementById('guardNameInp').addEventListener('input',function(){
-  state.guardName=this.value;
+function toast(msg, isSuccess=true){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isSuccess ? '' : ' err') + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function fmt(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+}
+
+// تشغيل الواجهة وإخفاء شاشة التحميل
+onValue(ref(db, 'rooms'), (snap) => {
+  state.rooms = snap.exists() ? snap.val() : {};
+  const select = document.getElementById('roomSelect');
+  
+  // الاحتفاظ بالاختيار الحالي إن وُجد
+  const currSel = select.value;
+  select.innerHTML = '<option value="">-- اضغط للاختيار --</option>';
+  
+  Object.values(state.rooms).forEach(r => {
+    const option = document.createElement('option');
+    option.value = r.id;
+    // إذا كانت القاعة مخصصة لعضو معين في لوحة التحكم تظهر باسمه
+    option.textContent = r.name + (r.memberName ? ` [عضو الاتصال: ${r.memberName}]` : '');
+    select.appendChild(option);
+  });
+  
+  if(currSel && state.rooms[currSel]) select.value = currSel;
+  
+  document.getElementById('subHeader').textContent = '✅ جاهز لإرسال التقارير';
+  const sp = document.getElementById('splash');
+  if(sp){ sp.style.opacity='0'; setTimeout(()=>sp.remove(), 400); }
 });
 
-window.startForm = function(){
-  state.guardName=document.getElementById('guardNameInp').value.trim()||'غير محدد';
+// التعامل مع العدادات الحركية
+window.step = function(key, val){
+  state[key] = Math.max(0, state[key] + val);
+  document.getElementById(key+'Val').textContent = state[key];
+};
+
+// تفعيل الزر عند اختيار قاعة
+window.onRoomChange = function(){
+  const id = document.getElementById('roomSelect').value;
+  state.room = state.rooms[id] || null;
+  document.getElementById('sendBtn').disabled = !state.room;
+};
+
+// آلية إرسال التقرير الفورية للمشرف
+window.sendReport = async function(){
   if(!state.room) return;
-  document.getElementById('configScreen').style.display='none';
-  document.getElementById('formScreen').style.display='flex';
-  document.getElementById('formRoomTitle').textContent=state.room.name;
-  if(state.guardName!=='غير محدد'){
-    document.getElementById('guardInfo').innerHTML=
-      `<span style="background:rgba(255,255,255,.1);border-radius:8px;padding:4px 12px;color:rgba(255,255,255,.75);font-size:12px">👤 ${state.guardName}</span>`;
+  const btn = document.getElementById('sendBtn');
+  const subjectName = document.getElementById('subjectInp').value.trim();
+  const guardName = document.getElementById('guardInp').value.trim();
+  
+  if(!subjectName) {
+    toast('⚠️ يرجى كتابة اسم المادة أولاً', false);
+    return;
   }
-  get(ref(db,`reports/${state.room.id}`)).then(snap=>{
-    if(snap.exists()){
-      const r=snap.val();
-      document.getElementById('lastBadge').style.display='flex';
-      document.getElementById('lastBadgeText').textContent=
-        `آخر إرسال: ${fmt(r.sentAt)}  |  حراس: ${r.guards}  |  غائب: ${r.absent}`;
-    }
-  });
-};
-
-window.goConfig = function(){
-  document.getElementById('formScreen').style.display='none';
-  document.getElementById('configScreen').style.display='flex';
-};
-
-window.change = function(f,d){
-  if(f==='g') state.guards=Math.max(1,state.guards+d);
-  if(f==='a') state.absent=Math.max(0,state.absent+d);
-  document.getElementById('gVal').textContent=state.guards;
-  const av=document.getElementById('aVal');
-  av.textContent=state.absent;
-  av.style.color=state.absent>0?'#F87171':'#8B949E';
-};
-
-window.submitReport = async function(){
-  const btn=document.getElementById('submitBtn');
-  btn.textContent='⟳ جاري الإرسال...'; btn.disabled=true;
-  const report={
-    roomId:state.room.id, roomName:state.room.name,
-    guardName:state.guardName, guards:state.guards,
-    absent:state.absent, notes:document.getElementById('notesInp').value,
-    sentAt:new Date().toISOString()
+  
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال المباشر...';
+  
+  const report = {
+    roomId: state.room.id,
+    roomName: state.room.name,
+    subjectName: subjectName,
+    guardName: guardName || "غير محدد",
+    guards: state.guards,
+    absent: state.absent,
+    notes: document.getElementById('notesInp').value.trim(),
+    sentAt: new Date().toISOString()
   };
+  
   try{
-    await set(ref(db,`reports/${state.room.id}`),report);
-    toast('✅ تم إرسال التقرير بنجاح!');
-    btn.textContent='✓ تم الإرسال!'; btn.classList.add('ok');
-    document.getElementById('lastBadge').style.display='flex';
-    document.getElementById('lastBadgeText').textContent=
-      `آخر إرسال: ${fmt(report.sentAt)}  |  حراس: ${report.guards}  |  غائب: ${report.absent}`;
-    setTimeout(()=>{btn.textContent='📤 إرسال تقرير جديد';btn.classList.remove('ok');btn.disabled=false;},2500);
-  } catch(e){
-    toast('❌ فشل الإرسال، تحقق من الإنترنت',false);
-    btn.textContent='📤 إرسال التقرير'; btn.disabled=false;
+    await set(ref(db, `reports/${state.room.id}`), report);
+    toast('✅ تم إرسال التقرير بنجاح للمشرف!');
+    
+    btn.textContent = '✓ تم الإرسال!';
+    btn.classList.add('ok');
+    
+    document.getElementById('lastBadge').style.display = 'flex';
+    document.getElementById('lastBadgeText').textContent = `آخر تقرير أرسل الساعة: ${fmt(report.sentAt)} | المادة: ${report.subjectName} | حراس: ${report.guards} | غائب: ${report.absent}`;
+    
+    // إعادة تعيين الحقول تمهيداً للفترة القادمة
+    document.getElementById('guardInp').value = '';
+    document.getElementById('notesInp').value = '';
+    state.guards = 0; state.absent = 0;
+    document.getElementById('guardsVal').textContent = '0';
+    document.getElementById('absentVal').textContent = '0';
+    
+    setTimeout(() => {
+      btn.textContent = '📤 إرسال تقرير جديد';
+      btn.classList.remove('ok');
+      btn.disabled = false;
+    }, 3000);
+    
+  } catch(e) {
+    toast('❌ فشل الإرسال المباشر، تحقق من الإنترنت', false);
+    btn.textContent = '📤 إعادة محاولة الإرسال';
+    btn.disabled = false;
   }
 };
 
-window.addEventListener('online', ()=>document.getElementById('offlineBar').style.display='none');
-window.addEventListener('offline',()=>document.getElementById('offlineBar').style.display='block');
+window.addEventListener('online', () => document.getElementById('offlineBar').style.display = 'none');
+window.addEventListener('offline', () => document.getElementById('offlineBar').style.display = 'block');
 
-loadRooms();
+// PWA Install
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBar').style.display = 'flex';
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if(outcome === 'accepted') { document.getElementById('installBar').style.display = 'none'; }
+  deferredPrompt = null;
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
