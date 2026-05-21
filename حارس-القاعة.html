@@ -9,7 +9,6 @@
 <meta name="apple-mobile-web-app-title" content="عضو الاتصال"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#0D1117"/>
-<link rel="manifest" href="manifest-guard.json"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231E3A8A'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='110'%3E📞%3C/text%3E%3C/svg%3E"/>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
@@ -50,7 +49,6 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
 .install-bar{background:#1F6FEB;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;}
 .install-bar span{color:#fff;font-size:12px;font-weight:700;}
 .install-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
-/* تصميم خانات الغياب الديناميكية */
 .absent-fields-container {display:flex; flex-direction:column; gap:10px; margin-top:12px;}
 .absent-student-row {background:#0D1117; border:1px dashed #30363D; padding:10px; border-radius:10px;}
 .absent-student-title {font-size:11px; color:#58A6FF; font-weight:bold; margin-bottom:6px;}
@@ -90,7 +88,6 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
   <div class="card">
     <div class="label">📚 اسم المادة الحالية:</div>
     <input type="text" id="subjectInp" class="input-field" placeholder="مثال: رياضيات، لغة عربية..." style="margin-bottom: 12px;"/>
-
     <div class="label">👤 اسم عضو الاتصال (المُرسِل):</div>
     <input type="text" id="guardInp" class="input-field" placeholder="اكتب اسمك الثلاثي الكامل..."/>
   </div>
@@ -104,7 +101,6 @@ input,textarea,button,select{font-family:'Tajawal',sans-serif;}
         <button class="counter-btn btn-plus" onclick="step('guards',1)">+</button>
       </div>
     </div>
-    
     <div>
       <div class="label">🚫 عدد التلاميذ الغائبين:</div>
       <div class="counter-box">
@@ -150,12 +146,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const state = {
-  rooms: {},
-  room: null,
-  guards: 0,
-  absent: 0
-};
+const state = { rooms: {}, room: null, guards: 0, absent: 0 };
 
 function toast(msg, isSuccess=true){
   const t = document.getElementById('toast');
@@ -174,14 +165,12 @@ onValue(ref(db, 'rooms'), (snap) => {
   const select = document.getElementById('roomSelect');
   const currSel = select.value;
   select.innerHTML = '<option value="">-- اضغط للاختيار --</option>';
-  
   Object.values(state.rooms).forEach(r => {
     const option = document.createElement('option');
     option.value = r.id;
     option.textContent = r.name + (r.memberName ? ` [تخصيص: ${r.memberName}]` : '');
     select.appendChild(option);
   });
-  
   if(currSel && state.rooms[currSel]) select.value = currSel;
   document.getElementById('subHeader').textContent = '✅ جاهز لإرسال التقارير';
   const sp = document.getElementById('splash');
@@ -193,14 +182,11 @@ window.step = function(key, val){
   document.getElementById(key+'Val').textContent = state[key];
 };
 
-// التحكم في عداد غياب التلاميذ وإنشاء خانات الأسماء بشكل ديناميكي
 window.stepAbs = function(val) {
   state.absent = Math.max(0, state.absent + val);
   document.getElementById('absentVal').textContent = state.absent;
-  
   const container = document.getElementById('absentFieldsContainer');
   container.innerHTML = '';
-  
   for(let i = 1; i <= state.absent; i++) {
     const row = document.createElement('div');
     row.className = 'absent-student-row';
@@ -226,71 +212,48 @@ window.sendReport = async function(){
   const btn = document.getElementById('sendBtn');
   const subjectName = document.getElementById('subjectInp').value.trim();
   const guardName = document.getElementById('guardInp').value.trim();
-  
-  if(!subjectName) {
-    toast('⚠️ يرجى كتابة اسم المادة أولاً', false);
-    return;
-  }
-  if(!guardName) {
-    toast('⚠️ يرجى كتابة اسم عضو الاتصال المُرسِل', false);
-    return;
-  }
-  
-  // تجميع قائمة التلاميذ الغائبين من الحقول الديناميكية
+  if(!subjectName) { toast('⚠️ يرجى كتابة اسم المادة أولاً', false); return; }
+  if(!guardName) { toast('⚠️ يرجى كتابة اسم عضو الاتصال المُرسِل', false); return; }
   const studentNames = document.querySelectorAll('.abs-name');
   const studentRegs = document.querySelectorAll('.abs-reg');
   let absentStudentsList = [];
-  
   for(let i=0; i<studentNames.length; i++) {
      const nameVal = studentNames[i].value.trim();
      const regVal = studentRegs[i].value.trim();
      if(nameVal || regVal) {
-        absentStudentsList.push({
-           index: i+1,
-           fullName: nameVal || "لم يكتب",
-           regNumber: regVal || "لم يكتب"
-        });
+        absentStudentsList.push({ index: i+1, fullName: nameVal || "لم يكتب", regNumber: regVal || "لم يكتب" });
      }
   }
-  
   btn.disabled = true;
   btn.textContent = '⏳ جاري الإرسال المباشر...';
-  
   const report = {
     roomId: state.room.id,
     roomName: state.room.name,
     subjectName: subjectName,
-    guardName: guardName, // اسم عضو الاتصال
+    guardName: guardName,
     guards: state.guards,
     absent: state.absent,
-    absentStudents: absentStudentsList, // مصفوفة غيابات التلاميذ المضافة حديثاً
+    absentStudents: absentStudentsList,
     notes: document.getElementById('notesInp').value.trim(),
     sentAt: new Date().toISOString()
   };
-  
   try{
     await set(ref(db, `reports/${state.room.id}`), report);
     toast('✅ تم إرسال التقرير بنجاح للمشرف!');
-    
     btn.textContent = '✓ تم الإرسال!';
     btn.classList.add('ok');
-    
     document.getElementById('lastBadge').style.display = 'flex';
     document.getElementById('lastBadgeText').textContent = `آخر تقرير: ${fmt(report.sentAt)} | المادة: ${report.subjectName} | حراس: ${report.guards} | غياب التلاميذ: ${report.absent}`;
-    
-    // تصغير الحقول وإعادة تصفير العدادات الديناميكية لقادم الفترات
     document.getElementById('notesInp').value = '';
     state.guards = 0; state.absent = 0;
     document.getElementById('guardsVal').textContent = '0';
     document.getElementById('absentVal').textContent = '0';
     document.getElementById('absentFieldsContainer').innerHTML = '';
-    
     setTimeout(() => {
       btn.textContent = '📤 إرسال تقرير جديد';
       btn.classList.remove('ok');
       btn.disabled = false;
     }, 2500);
-    
   } catch(e) {
     toast('❌ فشل الإرسال، تحقق من الشبكة', false);
     btn.textContent = '📤 إعادة محاولة الإرسال';
