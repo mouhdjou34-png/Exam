@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>تطبيق عضو الاتصال</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="عضو الاتصال"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0D1117"/>
+<meta name="description" content="نظام مراقبة الامتحانات - تطبيق عضو الاتصال"/>
+<link rel="manifest" href="manifest-guard.json"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231E3A8A'/%3E%3Ctext y='130' x='96' text-anchor='middle' font-size='110'%3E📞%3C/text%3E%3C/svg%3E"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Tajawal',sans-serif;background:#0D1117;color:#C9D1D9;min-height:100vh;max-width:440px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden;}
+input,textarea,button,select{font-family:'Tajawal',sans-serif;}
+.splash{position:fixed;inset:0;background:linear-gradient(160deg,#0D1117,#161B22,#1E3A8A);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .4s;}
+.splash h1{color:#fff;font-size:24px;font-weight:900;margin-top:16px;}
+.splash p{color:#8B949E;font-size:13px;margin-top:4px;}
+.sp-ico{width:90px;height:90px;background:rgba(255,255,255,0.05);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 8px 24px rgba(30,58,138,0.3);}
+.header{background:linear-gradient(135deg,#161B22 0%,#1E3A8A 100%);padding:50px 20px 25px;text-align:center;border-bottom:1px solid #21262D;position:relative;}
+.header h1{font-size:20px;color:#fff;font-weight:900;}
+.header p{font-size:12px;color:#58A6FF;margin-top:2px;font-weight:700;}
+.offline-bar{background:#7A1E1E;color:#FF7B72;padding:6px;text-align:center;font-size:11px;font-weight:700;display:none;}
+.container{padding:16px 20px 40px;flex:1;display:flex;flex-direction:column;gap:16px;}
+.card{background:#161B22;border:1px solid #21262D;border-radius:16px;padding:16px;}
+.label{font-size:13px;font-weight:700;color:#8B949E;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.select-room, .input-field{width:100%;background:#0D1117;border:1px solid #30363D;border-radius:12px;color:#C9D1D9;padding:12px;font-size:15px;font-weight:700;outline:none;appearance:none;-webkit-appearance:none;transition:border-color .2s;}
+.select-room:focus, .input-field:focus{border-color:#58A6FF;}
+.select-wrap{position:relative;}
+.select-wrap::after{content:'▼';font-size:10px;color:#8B949E;position:absolute;left:14px;top:16px;pointer-events:none;}
+.counter-box{display:flex;align-items:center;justify-content:space-between;background:#0D1117;padding:10px 14px;border-radius:12px;border:1px solid #21262D;margin-top:4px;}
+.counter-btn{width:42px;height:42px;border-radius:10px;border:none;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;}
+.counter-btn:active{transform:scale(0.9);}
+.btn-minus{background:#21262D;color:#C9D1D9;}
+.btn-plus{background:#1F6FEB;color:#fff;}
+.counter-val{font-size:26px;font-weight:900;color:#fff;min-width:40px;text-align:center;}
+.textarea{width:100%;background:#0D1117;border:1px solid #30363D;border-radius:12px;color:#C9D1D9;padding:12px;font-size:14px;outline:none;resize:none;height:70px;}
+.textarea:focus{border-color:#58A6FF;}
+.send-btn{width:100%;padding:14px;background:linear-gradient(135deg,#1F6FEB,#238636);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(31,111,235,0.2);transition:all .2s;margin-top:10px;}
+.send-btn:active{transform:scale(0.97);}
+.send-btn:disabled{background:#21262D;color:#8B949E;box-shadow:none;cursor:not-allowed;}
+.send-btn.ok{background:#238636;}
+.last-badge{background:rgba(35,134,54,0.1);border:1px solid rgba(56,139,60,0.2);border-radius:12px;padding:12px;display:none;align-items:center;gap:10px;color:#56D364;font-size:12px;font-weight:700;line-height:1.5;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1F6FEB;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,0.3);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;text-align:center;white-space:nowrap;}
+.toast.err{background:#A71D5D;}
+.toast.show{opacity:1;}
+.install-bar{background:#1F6FEB;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;}
+.install-bar span{color:#fff;font-size:12px;font-weight:700;}
+.install-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <div class="sp-ico">📞</div>
+  <h1>تطبيق عضو الاتصال</h1>
+  <p>نظام مراقبة الامتحانات الرقمي</p>
+</div>
+
+<div id="offlineBar" class="offline-bar">⚠️ أنت غير متصل بالإنترنت، سيتم الإرسال فور عودة الشبكة</div>
+
+<div id="installBar" class="install-bar">
+  <span>📲 أضف التطبيق للشاشة الرئيسية</span>
+  <button class="install-btn" id="installBtn">تثبيت</button>
+</div>
+
+<div class="header">
+  <h1>📞 تطبيق عضو الاتصال</h1>
+  <p id="subHeader">جاري تحميل القاعات المتاحة...</p>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="label">🏢 اختر القاعة المسؤولة:</div>
+    <div class="select-wrap">
+      <select class="select-room" id="roomSelect" onchange="onRoomChange()">
+        <option value="">-- اضغط للاختيار --</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">📚 اسم المادة الحالية:</div>
+    <input type="text" id="subjectInp" class="input-field" placeholder="مثال: رياضيات، لغة عربية..." style="margin-bottom: 12px;"/>
+
+    <div class="label">👤 اسم رئيس القاعة:</div>
+    <input type="text" id="guardInp" class="input-field" placeholder="اكتب اسم رئيس القاعة..."/>
+  </div>
+
+  <div class="card" style="display:flex; flex-direction:column; gap:14px;">
+    <div>
+      <div class="label">👮 عدد الحراس المتواجدين حالياً:</div>
+      <div class="counter-box">
+        <button class="counter-btn btn-minus" onclick="step('guards',-1)">-</button>
+        <div class="counter-val" id="guardsVal">0</div>
+        <button class="counter-btn btn-plus" onclick="step('guards',1)">+</button>
+      </div>
+    </div>
+    
+    <div>
+      <div class="label">🚫 عدد الأساتذة الغائبين:</div>
+      <div class="counter-box">
+        <button class="counter-btn btn-minus" onclick="step('absent',-1)">-</button>
+        <div class="counter-val" id="absentVal">0</div>
+        <button class="counter-btn btn-plus" onclick="step('absent',1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">📝 ملاحظات أو أحداث طارئة (اختياري):</div>
+    <textarea id="notesInp" class="textarea" placeholder="اكتب أي ملاحظات تخص سير الامتحان في القاعة هنا..."></textarea>
+  </div>
+
+  <div>
+    <button class="send-btn" id="sendBtn" onclick="sendReport()" disabled>📤 إرسال التقرير للمشرف العام</button>
+  </div>
+
+  <div class="last-badge" id="lastBadge">
+    <div style="font-size:20px">✨</div>
+    <div id="lastBadgeText"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD62It05IMsn3nXYo0B38sqXm4IQB6PGzc",
+  authDomain: "amana-989c9.firebaseapp.com",
+  databaseURL: "https://amana-989c9-default-rtdb.firebaseio.com",
+  projectId: "amana-989c9",
+  storageBucket: "amana-989c9.firebasestorage.app",
+  messagingSenderId: "796537653849",
+  appId: "1:796537653849:web:3a5d394f3ab71a8f2c6b1e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const state = {
+  rooms: {},
+  room: null,
+  guards: 0,
+  absent: 0
+};
+
+function toast(msg, isSuccess=true){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isSuccess ? '' : ' err') + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function fmt(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+}
+
+// تشغيل الواجهة وإخفاء شاشة التحميل
+onValue(ref(db, 'rooms'), (snap) => {
+  state.rooms = snap.exists() ? snap.val() : {};
+  const select = document.getElementById('roomSelect');
+  
+  // الاحتفاظ بالاختيار الحالي إن وُجد
+  const currSel = select.value;
+  select.innerHTML = '<option value="">-- اضغط للاختيار --</option>';
+  
+  Object.values(state.rooms).forEach(r => {
+    const option = document.createElement('option');
+    option.value = r.id;
+    // إذا كانت القاعة مخصصة لعضو معين في لوحة التحكم تظهر باسمه
+    option.textContent = r.name + (r.memberName ? ` [عضو الاتصال: ${r.memberName}]` : '');
+    select.appendChild(option);
+  });
+  
+  if(currSel && state.rooms[currSel]) select.value = currSel;
+  
+  document.getElementById('subHeader').textContent = '✅ جاهز لإرسال التقارير';
+  const sp = document.getElementById('splash');
+  if(sp){ sp.style.opacity='0'; setTimeout(()=>sp.remove(), 400); }
+});
+
+// التعامل مع العدادات الحركية
+window.step = function(key, val){
+  state[key] = Math.max(0, state[key] + val);
+  document.getElementById(key+'Val').textContent = state[key];
+};
+
+// تفعيل الزر عند اختيار قاعة
+window.onRoomChange = function(){
+  const id = document.getElementById('roomSelect').value;
+  state.room = state.rooms[id] || null;
+  document.getElementById('sendBtn').disabled = !state.room;
+};
+
+// آلية إرسال التقرير الفورية للمشرف
+window.sendReport = async function(){
+  if(!state.room) return;
+  const btn = document.getElementById('sendBtn');
+  const subjectName = document.getElementById('subjectInp').value.trim();
+  const guardName = document.getElementById('guardInp').value.trim();
+  
+  if(!subjectName) {
+    toast('⚠️ يرجى كتابة اسم المادة أولاً', false);
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال المباشر...';
+  
+  const report = {
+    roomId: state.room.id,
+    roomName: state.room.name,
+    subjectName: subjectName,
+    guardName: guardName || "غير محدد",
+    guards: state.guards,
+    absent: state.absent,
+    notes: document.getElementById('notesInp').value.trim(),
+    sentAt: new Date().toISOString()
+  };
+  
+  try{
+    await set(ref(db, `reports/${state.room.id}`), report);
+    toast('✅ تم إرسال التقرير بنجاح للمشرف!');
+    
+    btn.textContent = '✓ تم الإرسال!';
+    btn.classList.add('ok');
+    
+    document.getElementById('lastBadge').style.display = 'flex';
+    document.getElementById('lastBadgeText').textContent = `آخر تقرير أرسل الساعة: ${fmt(report.sentAt)} | المادة: ${report.subjectName} | حراس: ${report.guards} | غائب: ${report.absent}`;
+    
+    // إعادة تعيين الحقول تمهيداً للفترة القادمة
+    document.getElementById('guardInp').value = '';
+    document.getElementById('notesInp').value = '';
+    state.guards = 0; state.absent = 0;
+    document.getElementById('guardsVal').textContent = '0';
+    document.getElementById('absentVal').textContent = '0';
+    
+    setTimeout(() => {
+      btn.textContent = '📤 إرسال تقرير جديد';
+      btn.classList.remove('ok');
+      btn.disabled = false;
+    }, 3000);
+    
+  } catch(e) {
+    toast('❌ فشل الإرسال المباشر، تحقق من الإنترنت', false);
+    btn.textContent = '📤 إعادة محاولة الإرسال';
+    btn.disabled = false;
+  }
+};
+
+window.addEventListener('online', () => document.getElementById('offlineBar').style.display = 'none');
+window.addEventListener('offline', () => document.getElementById('offlineBar').style.display = 'block');
+
+// PWA Install
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBar').style.display = 'flex';
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if(outcome === 'accepted') { document.getElementById('installBar').style.display = 'none'; }
+  deferredPrompt = null;
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
